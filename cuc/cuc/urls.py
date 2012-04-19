@@ -26,5 +26,5 @@ urlpatterns = patterns('',
     url(r'^signup$', CreateView.as_view(model=User, form_class=UserCreationForm, success_url="/login")),
     url(r'^login$', django.contrib.auth.views.login, {'template_name': 'auth/login.html'}),
     
-    url(r'^post$', CreateView.as_view(model=Post, success_url="/post")),
+    url(r'^post$', CreateView.as_view(model=Post, success_url="/post"), name="post"),
 )

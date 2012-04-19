@@ -1,9 +1,22 @@
 {% extends 'base.html' %}
+{% block title %}Recent Posts{% endblock %}
 {% block content %}
 
+<h2>Recent Posts</h2>
+{% if user.is_authenticated %}
+<a href="{% url post %}">Post!</a>
+{% endif %}
 <ul>
-{% for post in object_list %}
-<li>{{ post }}</li>
-{% endfor %}
+	{% for post in object_list %}
+	<li>
+		{% if post.link %}
+			<a href="{{ post.link }}">{{ post }}</a>
+		{% else %}
+			{{ post }}
+		{% endif %}
+	</li>
+	{% endfor %}
 </ul>
+
+
 {% endblock %}

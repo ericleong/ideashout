@@ -7,11 +7,21 @@ from django.db.models.signals import post_save
 class Post(models.Model):
     title = models.CharField(max_length=200)
     description = models.CharField(max_length=2000)
-    time = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True)
+    link = models.CharField(max_length=300)
     poster = models.ForeignKey(User)
+    tags = models.ManyToManyField('Tag', blank=True)
+    location = models.ForeignKey('Location', blank=True)
     
     def __unicode__(self):
-        return u'"%s" by %s' % (self.title, self.poster)
+        return u'"%s" by %s on %s' % (self.title, self.poster, self.created)
+
+class Location(models.Model):
+    name = models.CharField(max_length=100)
+    room = models.CharField(max_length=100)
+    address = models.CharField(max_length=200)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User)
@@ -24,6 +34,7 @@ class Comment(models.Model):
     message = models.CharField(max_length=2000)
     time = models.DateTimeField(auto_now_add=True)
     commenter = models.ForeignKey(User)
+    post = models.ForeignKey(Post)
     
     def __unicode__(self):
         return u'"%s" by %s' % (self.message, self.poster)
