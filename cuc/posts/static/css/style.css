@@ -1,28 +1,37 @@
 a {
 	text-decoration: none;
+	color: #00CEFD;
 }
 
 a:link {
 	text-decoration: none;
+	color: #00CEFD;
 }
 
 a:visited {
-	color: #555194;
+	color: #13A0D8;
 }
 
 a:hover {
-	color: #555194;
+	color: #13A0D8;
 }
 
 #logo {
-	color: #13A0D8;
 	display: inline-block;
+}
+
+#logo a {
+	color: #C20B39;
 	font-family: 'Sansita One';
 	font-size: 56pt;
 }
 
 #logo a:visited {
-	color: #13A0D8;
+	color: #C20B39;
+}
+
+#logo a:visited {
+	color: #C20B39;
 }
 
 .post-title {
@@ -36,15 +45,18 @@ a:hover {
     width: 1024px;
     margin-left: auto;
     margin-right: auto;
+    position: relative;
 }
 
 .header {
     margin-top: 12px;
     margin-bottom: 12px;
     position: relative;
+    
+    width: 100%;
 }
 #navigation {
-	display: inline-block;
+    display: inline-block;
     vertical-align: center;
     margin-top: 12px;
     margin-bottom: 12px;

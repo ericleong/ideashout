@@ -10,12 +10,14 @@ class Post(models.Model):
     description = models.CharField(max_length=2000)
     created = models.DateTimeField(auto_now_add=True)
     link = models.CharField(max_length=300, blank=True)
-    author = models.ForeignKey(User)
+    author = models.ForeignKey(User, related_name='posts')
     tags = models.ManyToManyField('Tag', blank=True)
     location = models.ForeignKey('Location', blank=True, null=True)
-    time = models.DateTimeField(blank=True, null=True)
+    start_time = models.DateTimeField(blank=True, null=True)
+    end_time = models.DateTimeField(blank=True, null=True)
     private = models.BooleanField(default=False)
-    slug = models.SlugField(blank=True)    
+    slug = models.SlugField(blank=True)
+    committed = models.ManyToManyField(User, related_name='events', blank=True, null=True)
     
     def __unicode__(self):
         return u'"%s" by %s on %s' % (self.title, self.author, self.created)
@@ -58,5 +60,3 @@ def create_profile(sender, **kw):
         profile.save()
 
 post_save.connect(create_profile, sender=User, dispatch_uid="users-profilecreation-signal")
-    
-    

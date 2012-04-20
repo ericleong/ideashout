@@ -7,7 +7,9 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
+from icalendar.cal import Calendar, Event
 from posts.models import Post, Response
+import datetime
 
 class latestPostsFeed(Feed):
     title = "CUES Feed"
@@ -93,3 +95,27 @@ class PostCreateView(CreateView):
 
 def api_post(request):
     return HttpResponse('hi')
+
+def generate_calendar(request):
+    from icalendar.prop import UTC
+    
+    cal = Calendar()
+    posts = Post.objects.order_by('-created')
+    
+    for post in posts:
+        if post.start_time:
+            # Make sure we have a time
+            event = Event()
+            event.add('summary', post.title)
+            event.add('dtstart', post.start_time)
+            event.add('dtend', post.end_time if post.end_time else post.start_time)
+            #event.add('dtstamp', datetime(2005,4,4,0,10,0,tzinfo=UTC))
+            event['uid'] = post.id
+            event['organizer'] = post.author.username
+            
+            if post.location:
+                event['location'] = post.location.name
+        
+            cal.add_component(event)
+    
+    return HttpResponse(cal.as_string())

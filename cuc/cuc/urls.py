@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from posts.models import Post
 from posts.views import latestPostsFeed, PostCreationForm, PostCreateView, \
-    PostView
+    PostView, generate_calendar
 import django.contrib.auth.views
 
 # Uncomment the next two lines to enable the admin:
@@ -32,4 +32,5 @@ urlpatterns = patterns('',
     
     url(r'^post$', PostCreateView.as_view(success_url="/"), name="post"),
     url(r'^rss$', latestPostsFeed(), name="latest_rss"),
+    url(r'^ical$', generate_calendar, name="web_calendar")
 )
