@@ -3,10 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <title>{% block title %}Untitled{% endblock %}</title>
+
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/reset.css" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/style.css" />
+<link href='http://fonts.googleapis.com/css?family=Maven+Pro:400,500,700' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Sansita+One' rel='stylesheet' type='text/css'>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
 {% block script %}{% endblock %}
 </head>
 <body>
-<h1>Club Connect</h1>
-{% block content %} {% endblock %}
+	<div class="page">
+		<div class="header">
+			<div id="logo"><a href="/">Club Connect</a></div>			
+			<div id="navigation">
+				{% if user.is_authenticated %}
+				<a href="{% url post %}">Post!</a>
+				{% else %}
+				<a href="{% url login %}">Log in</a>
+				{% endif %}
+			</div>
+		</div>
+		<div class="content">
+			{% block content %}{% endblock %}
+		</div>
+	</div>
 </body>
 </html>

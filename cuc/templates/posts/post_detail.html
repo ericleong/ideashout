@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+
+	<div class="post-title">
+		<a href="{% if post.link %}{{ post.link }}{% else %}{{ post.get_absolute_url }}{% endif %}">{{ post.title }}</a>
+	</div>
+	<div class="post-details">
+		<span class="post-author">posted by {{ post.author }}</span>
+		<span class="post-time">{{ post.created|naturaltime }}</span>
+	</div>
+	<div class="post-description">{{ post.description }}</div>
+	
+	<div class="post-responses">
+		<ul class="responses">
+		{% for response in post.responses.all %}
+			<li class="response">
+				<div class="response-details">
+					<span class="response-author">{{ response.author }}</span><span class="response-created">{{ response.created|naturaltime }}</span>
+				</div>
+				<div class="response-message">{{ response.message }}</div>
+			</li>
+		{% empty %}
+			<li><div class="post-title">No responses! Respond below!</div></li>
+		{% endfor %}
+		</ul>
+		
+		{% if user.is_authenticated %}
+		<form action="" method="post" enctype="multipart/form-data">
+			{% csrf_token %} {{ comment_form.as_p }} 
+			<input type="submit" value="Submit" />
+		</form>
+		{% endif %}
+	</div>
+
+{% endblock %}
