@@ -1,3 +1,4 @@
 ENV
 *.pyc
-example/test.db
+cuc/test.db
+.pydevproject

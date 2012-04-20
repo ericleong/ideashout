@@ -24,7 +24,7 @@ class Post(models.Model):
         return "/post/%s/" % self.slug
     
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.title)
+        self.slug = slugify(self.title)[:50]
         super(Post, self).save(*args, **kwargs)
 
 class Location(models.Model):
