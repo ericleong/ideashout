@@ -76,10 +76,11 @@ class PostView(DetailView):
         
         return context
 
-class PostCreationForm(forms.ModelForm):
+# Create Posts!
+class LinkCreationForm(forms.ModelForm):
     class Meta:
         model = Post
-        exclude = ('author', 'slug')
+        fields = ('title', 'description', 'link', 'private')
         widgets = {
             'description': Textarea(attrs={'cols': 30, 'rows': 4}),
         }
@@ -87,22 +88,49 @@ class PostCreationForm(forms.ModelForm):
     def form_valid(self, form):
         self.object = form.save(commit=False)
         self.object.author = self.request.user
-        super(PostCreationForm, self).form_valid(form)
+        super(LinkCreationForm, self).form_valid(form)
         
-class PostCreateView(CreateView):
+class CreateLinkView(CreateView):
     model = Post
-    form_class = PostCreationForm
+    form_class = LinkCreationForm
+    template_name = 'posts/link_form.html'
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
         self.object.author = self.request.user
         
-        return super(PostCreateView, self).form_valid(form)
+        return super(CreateLinkView, self).form_valid(form)
+    
+
+class EventCreationForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ('title', 'description', 'link', 'start_time', 'end_time', 'private')
+        widgets = {
+            'description': Textarea(attrs={'cols': 30, 'rows': 4}),
+        }
+        
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.author = self.request.user
+        super(EventCreationForm, self).form_valid(form)
+        
+class CreateEventView(CreateView):
+    model = Post
+    form_class = EventCreationForm
+    template_name = 'posts/event_form.html'
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.author = self.request.user
+        
+        return super(CreateEventView, self).form_valid(form)
 
 def api_post(request):
     return HttpResponse('hi')
 
 def generate_calendar(request):
+    """http://codespeak.net/icalendar/"""
     from icalendar.prop import UTC
     
     cal = Calendar()

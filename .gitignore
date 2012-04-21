@@ -1,5 +1,5 @@
 *.pyc
 cuc/test.db
-.pydevproject
-.project
-.settings
+*.pydevproject
+*.project
+*.settings

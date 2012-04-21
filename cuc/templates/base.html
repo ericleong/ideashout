@@ -21,7 +21,7 @@
 			<div id="logo"><a href="/">Club Connect</a></div>			
 			<div id="navigation">
 				{% if user.is_authenticated %}
-				<a href="{% url post %}">Post!</a>
+				<a href="{% url create-link %}">Post!</a>
 				{% else %}
 				<a href="{% url login %}">Log in</a>
 				{% endif %}

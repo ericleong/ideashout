@@ -1,4 +1,6 @@
-{% extends "base.html" %}
+{% extends "post-create.html" %}
+
+{% block title %}Post Event{% endblock %}
 
 {% block script %}
 <script type="text/javascript">
@@ -9,10 +11,11 @@ $(function(){
 </script>
 {% endblock script %}
 
-{% block title %}Post{% endblock %}
+{% block form %}
+<div class="post-title"><h1>Post Event</h1></div>
 
-{% block content %}
 <form action="" method="post" enctype="multipart/form-data">
-	{% csrf_token %} {{ form.as_p }} <input type="submit" value="Submit" />
+	{% csrf_token %} {{ form.as_p }}
+	<input type="submit" value="Post Event!" />
 </form>
 {% endblock %}
