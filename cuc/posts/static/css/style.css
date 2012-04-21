@@ -1,3 +1,8 @@
+body {
+	font-family: 'Maven Pro', sans-serif;
+	font-size: 12pt;
+}
+
 a {
 	text-decoration: none;
 	color: #00CEFD;
@@ -34,13 +39,6 @@ a:hover {
 	color: #C20B39;
 }
 
-.post-title {
-	font-family: 'Maven Pro';
-	font-size: 24pt;
-	
-	margin-bottom: 6px;
-}
-
 .page {
     width: 1024px;
     margin-left: auto;
@@ -69,8 +67,15 @@ a:hover {
 }
 
 .post {
-    margin-top: 6px;
+    margin-top: 12px;
     margin-bottom: 6px;
+}
+
+.post-title {
+	font-family: 'Maven Pro';
+	font-size: 24pt;
+	
+	margin-bottom: 6px;
 }
 
 .post-details {
@@ -117,3 +122,11 @@ li.response {
     font-family: 'Maven Pro', sans-serif;
     margin: 6px 6px 6px 24px;
 }
+
+/* css for timepicker */
+.ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
+.ui-timepicker-div dl { text-align: left; }
+.ui-timepicker-div dl dt { height: 25px; margin-bottom: -25px; }
+.ui-timepicker-div dl dd { margin: 0 10px 10px 65px; }
+.ui-timepicker-div td { font-size: 90%; }
+.ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }

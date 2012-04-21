@@ -4,6 +4,10 @@
 {% block title %}Club Connect{% endblock %}
 
 {% block content %}
+<div class="post-feeds">
+	<a href="{% url web_calendar %}">Calendar</a>
+	<a href="{% url latest_rss %}">RSS</a>
+</div>
 <ul class="posts">
 	{% for post in posts %}
 	{% if user.is_authenticated or not post.private %}

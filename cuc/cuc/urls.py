@@ -32,5 +32,5 @@ urlpatterns = patterns('',
     
     url(r'^post$', PostCreateView.as_view(success_url="/"), name="post"),
     url(r'^rss$', latestPostsFeed(), name="latest_rss"),
-    url(r'^ical$', generate_calendar, name="web_calendar")
+    url(r'^ical(?:\.ics)?$', generate_calendar, name="web_calendar")
 )

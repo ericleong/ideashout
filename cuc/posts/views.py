@@ -8,6 +8,7 @@ from django.shortcuts import redirect
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
 from icalendar.cal import Calendar, Event
+from icalendar.prop import vText, vCalAddress
 from posts.models import Post, Response
 import datetime
 
@@ -104,20 +105,27 @@ def generate_calendar(request):
     cal.add('version', '2.0')
     posts = Post.objects.order_by('-created')
     
+    # TODO: separate out private events using a private URL?
     for post in posts:
         if post.start_time:
             # Make sure we have a time
             event = Event()
-            event.add('summary', post.title)
-            event.add('description', post.description)
+            event.add('summary', vText(post.title))
             event.add('dtstart', post.start_time)
             event.add('dtend', post.end_time if post.end_time else post.start_time)
             #event.add('dtstamp', datetime(2005,4,4,0,10,0,tzinfo=UTC))
-            event['uid'] = post.id
-            event['organizer'] = post.author.username
+            event['uid'] = vText(post.id)
+            event['organizer'] = vText(post.author.username)
+            event['description'] = vText(post.description)
             
             if post.location:
-                event['location'] = post.location.name
+                event['location'] = vText(post.location.name)
+                
+            for commit in post.committed.all():
+                attendee = vCalAddress('MAILTO:' + commit.email)
+                name = ([commit.first_name, commit.last_name]) if (commit.first_name and commit.last_name) else commit.username;
+                attendee.params['cn'] = vText(name)
+                event.add('attendee', attendee, encode=0)
         
             cal.add_component(event)
     
