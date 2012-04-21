@@ -1,6 +1,7 @@
 # Create your views here.
 
 from django import forms
+from django.contrib.auth.models import User
 from django.contrib.syndication.views import Feed
 from django.forms.widgets import Textarea
 from django.http import HttpResponse
@@ -31,6 +32,10 @@ class latestPostsFeed(Feed):
             return item.link
         else:
             return ''
+        
+class UserView(DetailView):
+    model = User
+    slug_field = 'username'
 
 class ResponseForm(forms.ModelForm):
     

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}{{ user.username }}{% endblock %}
+
+{% block content %}
+
+	<div class="user-title">
+		<h1><a href="{% url userprofile user.username %}">{{ user.username }}</a></h1>
+	</div>
+	
+	<div class="user-description">
+		{{ user.get_profile.bio }}
+	</div>
+	
+	<div class="user-posts">
+		<ul class="posts">
+		{% for post in user.posts.all %}
+			<li class="post">
+				<div class="post-title">
+					<a href="{% if post.link %}{{ post.link }}{% else %}{{ post.get_absolute_url }}{% endif %}">{{ post.title }}</a>
+				</div>
+				<div class="post-details">
+					<span class="post-comments"><a href="{{ post.get_absolute_url }}">{{ post.responses.count }} responses</a></span>
+					<span class="post-created">{{ post.created|naturaltime }}</span>
+				</div>
+			</li>
+		{% endfor %}
+		</ul>
+	</div>
+
+{% endblock %}

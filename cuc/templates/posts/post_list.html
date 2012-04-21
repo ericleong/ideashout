@@ -17,7 +17,7 @@
 		</div>
 		<div class="post-details">
 			<span class="post-comments"><a href="{{ post.get_absolute_url }}">{{ post.responses.count }} responses</a></span>
-			<span class="post-author">posted by {{ post.author }}</span>
+			<span class="post-author">posted by <a href="{% url userprofile post.author %}">{{ post.author }}</a></span>
 			<span class="post-created">{{ post.created|naturaltime }}</span>
 		</div>
 	</li>

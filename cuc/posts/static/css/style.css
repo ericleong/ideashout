@@ -123,6 +123,32 @@ li.response {
     margin: 6px 6px 6px 24px;
 }
 
+/* user */
+.user-title {
+	font-family: 'Maven Pro';
+	font-size: 24pt;
+	
+	margin-bottom: 6px;
+}
+
+.user-details {
+	font-family: 'Maven Pro', sans-serif;
+	font-size: 11pt;
+	margin-left: 24px;
+}
+
+.user-description {
+	font-family: 'Maven Pro', sans-serif;
+	font-size: 12pt;
+	margin-top: 12px;
+	line-height: 1.15;
+}
+
+.user-posts {
+	margin-top: 24px;
+}
+
+
 /* css for timepicker */
 .ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
 .ui-timepicker-div dl { text-align: left; }
