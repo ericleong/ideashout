@@ -10,8 +10,26 @@
 	</div>
 	<div class="post-details">
 		<span class="post-author">posted by <a href="{% url userprofile post.author %}">{{ post.author }}</a></span>
-		<span class="post-time">{{ post.created|naturaltime }}</span>
+		<span class="post-created">{{ post.created|naturaltime }}</span>
 	</div>
+	
+	{% if post.start_time %}
+	<div class="post-info">
+		{% if post.start_time %}
+		<div class="post-time">
+			<span class="post-start-time">{{ post.start_time|date:"f A l F j" }}</span>
+			 to 
+			<span class="post-end-time">{{ post.end_time|date:"f A l F j" }}</span>
+		</div>
+		{% endif %}
+		{% if post.location %}
+		<div class="post-location">
+			{{ post.location.name }} 
+		</div>
+		{% endif %}
+	</div>
+	{% endif %}
+	
 	<div class="post-description">{{ post.description }}</div>
 	
 	<div class="post-metadata">

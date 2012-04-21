@@ -10,31 +10,12 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from icalendar.cal import Calendar, Event
-from icalendar.prop import vText, vCalAddress
+from icalendar.prop import vText, vCalAddress, vUri
 from posts.models import Post, Response, Tag
 import datetime
 
-class latestPostsFeed(Feed):
-    title = "CUES Feed"
-    link = "/posts/"
-    description = "Feed of posts our members think are awesome!"
-
-    def items(self):
-        return Post.objects.order_by('-created')[:10]
-
-    def item_title(self, item):
-        return item.title
-
-    def item_description(self, item):
-        return item.description
-    
-    def item_link(self, item):
-        if item and item.link:
-            return item.link
-        else:
-            return ''
-
 class TagView(ListView):
+    # TODO: a slightly different page with the tag name?
     template_name = "posts/post_list.html"
     
     def get_queryset(self):
@@ -141,8 +122,25 @@ class CreateEventView(CreateLinkView):
     form_class = EventCreationForm
     template_name = 'posts/event_form.html'
 
-def api_post(request):
-    return HttpResponse('hi')
+class latestPostsFeed(Feed):
+    title = "Club Connect Posts"
+    link = "/posts/"
+    description = "Feed of posts our members think are awesome!"
+
+    def items(self):
+        return Post.objects.order_by('-created')[:10]
+
+    def item_title(self, item):
+        return item.title
+
+    def item_description(self, item):
+        return item.description
+    
+    def item_link(self, item):
+        if item and item.link:
+            return item.link
+        else:
+            return ''
 
 def generate_calendar(request):
     """http://codespeak.net/icalendar/"""
@@ -152,6 +150,9 @@ def generate_calendar(request):
     cal.add('prodid', '-//Club Connect//ericleong.me//')
     cal.add('version', '2.0')
     posts = Post.objects.order_by('-created')
+    
+    cal['X-WR-CALNAME'] = 'Club Connect Events'
+    cal['CALSCALE'] = 'GREGORIAN'
     
     # TODO: separate out private events using a private URL?
     for post in posts:
@@ -165,6 +166,7 @@ def generate_calendar(request):
             event['uid'] = vText(post.id)
             event['organizer'] = vText(post.author.username)
             event['description'] = vText(post.description)
+            event['url'] = vUri(post.get_absolute_url())
             
             if post.location:
                 event['location'] = vText(post.location.name)

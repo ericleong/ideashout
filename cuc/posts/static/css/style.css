@@ -96,6 +96,12 @@ h1 {
 	margin-left: 24px;
 }
 
+.post-info {
+	font-family: 'Maven Pro', sans-serif;
+	font-size: 14pt;
+	margin-top: 12px;
+}
+
 .post-description {
 	font-family: 'Maven Pro', sans-serif;
 	font-size: 12pt;
