@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
+from django.views.generic.list import ListView
 from icalendar.cal import Calendar, Event
 from icalendar.prop import vText, vCalAddress
 from posts.models import Post, Response, Tag
@@ -32,14 +33,20 @@ class latestPostsFeed(Feed):
             return item.link
         else:
             return ''
+
+class TagView(ListView):
+    template_name = "posts/post_list.html"
+    
+    def get_queryset(self):
+        return Post.objects.order_by("-created").filter(tags__name=self.kwargs['tag'])
+
         
 class UserView(DetailView):
     model = User
     slug_field = 'username'
 
 class ResponseForm(forms.ModelForm):
-    message = forms.CharField(label="Post a Response")
-    
+        
     class Meta:
         model = Response
         fields = ('message', )

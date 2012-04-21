@@ -8,7 +8,7 @@ from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from posts.models import Post, UserProfile
 from posts.views import latestPostsFeed, PostView, generate_calendar, UserView, \
-    CreateLinkView, CreateEventView
+    CreateLinkView, CreateEventView, TagView
 import django.contrib.auth.views
 
 # Uncomment the next two lines to enable the admin:
@@ -33,6 +33,9 @@ urlpatterns = patterns('',
     url(r'^post/$', RedirectView.as_view(url='/create/link')),
     url(r'^create/link$', CreateLinkView.as_view(success_url="/"), name="create-link"),
     url(r'^create/event$', CreateEventView.as_view(success_url="/"), name="create-event"),
+    
+    # Tags
+    url(r'^tag/(?P<tag>.+)/$', TagView.as_view(model=Post, context_object_name="posts",), name="tag"),
     
     # Accounts
     url(r'^signup$', CreateView.as_view(model=User, form_class=UserCreationForm, success_url="/login"), name="signup"),

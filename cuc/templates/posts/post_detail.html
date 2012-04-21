@@ -17,7 +17,7 @@
 	<div class="post-metadata">
 		<ul class="post-tags">
 			{% for tag in post.tags.all %}
-				<li>{{ tag }}</li>
+				<li class="tag"><a href="{% url tag tag %}">{{ tag }}</a></li>
 			{% endfor %}
 		</ul>
 	</div>
