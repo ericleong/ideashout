@@ -3,14 +3,14 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.syndication.views import Feed
-from django.forms.widgets import Textarea
+from django.forms.widgets import Textarea, TextInput
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
 from icalendar.cal import Calendar, Event
 from icalendar.prop import vText, vCalAddress
-from posts.models import Post, Response
+from posts.models import Post, Response, Tag
 import datetime
 
 class latestPostsFeed(Feed):
@@ -38,6 +38,7 @@ class UserView(DetailView):
     slug_field = 'username'
 
 class ResponseForm(forms.ModelForm):
+    message = forms.CharField(label="Post a Response")
     
     class Meta:
         model = Response
@@ -78,34 +79,47 @@ class PostView(DetailView):
 
 # Create Posts!
 class LinkCreationForm(forms.ModelForm):
+    link = forms.URLField(required=True)
+    tags = forms.CharField(help_text="")
+    
     class Meta:
         model = Post
-        fields = ('title', 'description', 'link', 'private')
+        fields = ('title', 'description', 'link', 'tags', 'private')
         widgets = {
             'description': Textarea(attrs={'cols': 30, 'rows': 4}),
+            'tags': TextInput(),
         }
-        
-    def form_valid(self, form):
-        self.object = form.save(commit=False)
-        self.object.author = self.request.user
-        super(LinkCreationForm, self).form_valid(form)
-        
+    
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(LinkCreationForm, self).get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        context['tags'] = Tag.objects.all()
+        return context
+    
 class CreateLinkView(CreateView):
     model = Post
     form_class = LinkCreationForm
     template_name = 'posts/link_form.html'
 
     def form_valid(self, form):
+        tag_list = []
+        tags = form.data["tags"].split(",")
+        for tag_str in tags:
+            tag, created = Tag.objects.get_or_create(name=tag_str) #@UnusedVariable
+            tag_list.append(tag.pk)
+        
+        form.cleaned_data["tags"] = tag_list
         self.object = form.save(commit=False)
         self.object.author = self.request.user
         
         return super(CreateLinkView, self).form_valid(form)
     
 
-class EventCreationForm(forms.ModelForm):
+class EventCreationForm(LinkCreationForm):
     class Meta:
         model = Post
-        fields = ('title', 'description', 'link', 'start_time', 'end_time', 'private')
+        fields = ('title', 'description', 'link', 'start_time', 'end_time', 'tags', 'private')
         widgets = {
             'description': Textarea(attrs={'cols': 30, 'rows': 4}),
         }
@@ -115,16 +129,10 @@ class EventCreationForm(forms.ModelForm):
         self.object.author = self.request.user
         super(EventCreationForm, self).form_valid(form)
         
-class CreateEventView(CreateView):
+class CreateEventView(CreateLinkView):
     model = Post
     form_class = EventCreationForm
     template_name = 'posts/event_form.html'
-
-    def form_valid(self, form):
-        self.object = form.save(commit=False)
-        self.object.author = self.request.user
-        
-        return super(CreateEventView, self).form_valid(form)
 
 def api_post(request):
     return HttpResponse('hi')

@@ -72,6 +72,12 @@ h1 {
     font-size: 24pt;
 }
 
+/* posts */
+.post-feeds {
+	position: absolute;
+	right: 0px;
+}
+
 .post {
     margin-top: 12px;
     margin-bottom: 6px;
@@ -95,6 +101,25 @@ h1 {
 	font-size: 12pt;
 	margin-top: 12px;
 	line-height: 1.15;
+}
+
+.post-metadata {
+	font-family: 'Maven Pro', sans-serif;
+	font-size: 11pt;
+	margin-top: 12px;
+	position: relative;
+}
+
+ul.post-tags {
+	color: #00CEFD;
+	position: absolute;
+	right: 0px;
+}
+ul.post-tags li {
+	display: inline-block;
+	
+	margin-left: 6px;
+	margin-right: 6px;
 }
 
 /* responses */
@@ -155,6 +180,10 @@ li.response {
 }
 
 /* posting css */
+form {
+	width: 50%;
+}
+
 .post-types {
 	padding-top: 12px;
 	margin-top: 12px;
@@ -169,6 +198,14 @@ li.response {
 
 form p {
     margin-top: 12px;
+
+	font-family: 'Maven Pro', sans-serif;
+	font-size: 12pt;
+}
+
+form p label {
+	display: block;
+    margin-bottom: 6px;
 }
 
 form p input[type="text"] {
@@ -179,22 +216,35 @@ form p input[type="text"] {
     font-size: 16pt;
 }
 
+#id_tags {
+	font-size: 14pt;
+}
+
+form p input[type="password"] {
+    margin-top: 6px;
+    display: block;
+    
+    font-family: 'Maven Pro', sans-serif;
+    font-size: 16pt;
+}
+
 #id_link {
     font-size: 12pt;
+    width: 100%;
 }
 
 form p textarea {
     margin-top: 6px;
     display: block;
-    width: 50%;
+    width: 100%;
     height: 120px;
     
     font-family: 'Maven Pro', sans-serif;
     font-size: 12pt;
 }
 
-input[type=text] {
-    width: 50%
+#id_title {
+    width: 100%;
 }
 
 input[type=submit] {

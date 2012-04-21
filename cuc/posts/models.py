@@ -9,7 +9,7 @@ class Post(models.Model):
     title = models.CharField(max_length=200)
     description = models.CharField(max_length=2000)
     created = models.DateTimeField(auto_now_add=True)
-    link = models.CharField(max_length=300, blank=True)
+    link = models.URLField(blank=True)
     author = models.ForeignKey(User, related_name='posts')
     tags = models.ManyToManyField('Tag', blank=True)
     location = models.ForeignKey('Location', blank=True, null=True)
@@ -42,6 +42,9 @@ class UserProfile(models.Model):
     
 class Tag(models.Model):
     name = models.CharField(max_length=30)
+    
+    def __unicode__(self):
+        return u'%s' % (self.name, )
     
 class Response(models.Model):
     message = models.CharField(max_length=2000)

@@ -1,15 +1,40 @@
 {% extends "post-create.html" %}
 
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery-ui-1.8.19.custom.css" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery.tagit.css" />
+{% endblock %}
+
 {% block title %}Post Event{% endblock %}
 
 {% block script %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.8.19.custom.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/tag-it.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-timepicker-addon.js"></script>
+
 <script type="text/javascript">
 $(function(){
 	$('#id_start_time').datetimepicker();
 	$('#id_end_time').datetimepicker();
 });
+
+$(document).ready(function(){
+	$("#id_tags").tagit({
+		caseSensitive: false,
+		allowSpaces: true,
+		removeConfirmation: true,
+		availableTags: [{% for tag in tags %}"{{ tag }}"{% if not forloop.last %},{% endif %}{% endfor %}]
+	});
+});
 </script>
 {% endblock script %}
+
+{% block options %}
+<div class="post-types">
+	<span><a href="{% url create-link %}">Link</a></span>
+	<span><a href="{% url create-event %}">Event</a></span>
+</div>
+{% endblock %}
 
 {% block form %}
 <div class="post-title"><h1>Post Event</h1></div>

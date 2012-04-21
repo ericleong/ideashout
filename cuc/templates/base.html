@@ -6,13 +6,11 @@
 
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/reset.css" />
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/style.css" />
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery-ui-1.8.19.custom.css" />
 <link href='http://fonts.googleapis.com/css?family=Maven+Pro:400,500,700' rel='stylesheet' type='text/css'>
 <link href='http://fonts.googleapis.com/css?family=Sansita+One' rel='stylesheet' type='text/css'>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.8.19.custom.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-timepicker-addon.js"></script>
+{% block css %}{% endblock %}
 
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 {% block script %}{% endblock %}
 </head>
 <body>

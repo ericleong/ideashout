@@ -14,6 +14,14 @@
 	</div>
 	<div class="post-description">{{ post.description }}</div>
 	
+	<div class="post-metadata">
+		<ul class="post-tags">
+			{% for tag in post.tags.all %}
+				<li>{{ tag }}</li>
+			{% endfor %}
+		</ul>
+	</div>
+	
 	<div class="post-responses">
 		<ul class="responses">
 		{% for response in post.responses.all %}
@@ -23,8 +31,6 @@
 				</div>
 				<div class="response-message">{{ response.message }}</div>
 			</li>
-		{% empty %}
-			<li><div class="post-title">No responses! Respond below!</div></li>
 		{% endfor %}
 		</ul>
 		

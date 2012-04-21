@@ -27,9 +27,10 @@ urlpatterns = patterns('',
     
     # Posts
     url(r'^$', ListView.as_view(model=Post, queryset=Post.objects.order_by("-created"), context_object_name="posts",)), 
-    url(r'^post/(?P<slug>.+)/$', PostView.as_view(model=Post, ), "post"),
+    url(r'^post/(?P<slug>.+)/$', PostView.as_view(model=Post, ), name="post"),
+    #url(r'^post/(?P<slug>.+)/$', PostView.as_view(model=Post, )),
     
-    url(r'^post/', RedirectView.as_view(url='/create/link')),
+    url(r'^post/$', RedirectView.as_view(url='/create/link')),
     url(r'^create/link$', CreateLinkView.as_view(success_url="/"), name="create-link"),
     url(r'^create/event$', CreateEventView.as_view(success_url="/"), name="create-event"),
     
@@ -37,6 +38,7 @@ urlpatterns = patterns('',
     url(r'^signup$', CreateView.as_view(model=User, form_class=UserCreationForm, success_url="/login"), name="signup"),
     url(r'^login$', django.contrib.auth.views.login, {'template_name': 'auth/login.html'}, name="login"),
     url(r'^user/(?P<slug>.+)/$', UserView.as_view(model=User, ), name="userprofile"),
+    url(r'^logout$', django.contrib.auth.views.logout, name="logout"),
 
     # Feeds
     url(r'^rss$', latestPostsFeed(), name="latest_rss"),
