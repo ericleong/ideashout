@@ -100,6 +100,8 @@ def generate_calendar(request):
     from icalendar.prop import UTC
     
     cal = Calendar()
+    cal.add('prodid', '-//Club Connect//ericleong.me//')
+    cal.add('version', '2.0')
     posts = Post.objects.order_by('-created')
     
     for post in posts:
@@ -107,6 +109,7 @@ def generate_calendar(request):
             # Make sure we have a time
             event = Event()
             event.add('summary', post.title)
+            event.add('description', post.description)
             event.add('dtstart', post.start_time)
             event.add('dtend', post.end_time if post.end_time else post.start_time)
             #event.add('dtstamp', datetime(2005,4,4,0,10,0,tzinfo=UTC))
