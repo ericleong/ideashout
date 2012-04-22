@@ -130,7 +130,7 @@ class CreateLinkView(CreateView):
 
 class EventCreationForm(LinkCreationForm):
     location = forms.CharField(max_length=100)
-    room = forms.CharField(max_length=100)
+    room = forms.CharField(max_length=100, required=False)
     address = forms.CharField(max_length=200)
     link = forms.URLField(required=False)
     

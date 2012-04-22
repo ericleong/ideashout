@@ -31,7 +31,7 @@ class Post(models.Model):
 
 class Location(models.Model):
     name = models.CharField(max_length=100)
-    room = models.CharField(max_length=100)
+    room = models.CharField(max_length=100, blank=True)
     address = models.CharField(max_length=200)
     # TODO: not using these for now
     latitude = models.FloatField(null=True)
