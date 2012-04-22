@@ -1,12 +1,10 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.views.generic.base import RedirectView
-from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
-from posts.models import Post, UserProfile
+from posts.models import Post
 from posts.views import latestPostsFeed, PostView, generate_calendar, UserView, \
     CreateLinkView, CreateEventView, TagView, SignupForm, EditUserView
 import django.contrib.auth.views
