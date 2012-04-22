@@ -1,4 +1,4 @@
-# -*- coding: latin-1 -*-
+# -*- coding: utf-8 -*-
 
 """
 This module parses and generates contentlines as defined in RFC 2445
@@ -12,13 +12,38 @@ Copyright, 2005: Max M <maxm@mxm.dk>
 License: GPL (Just contact med if and why you would like it changed)
 """
 
-# from python
-from types import TupleType, ListType
-SequenceTypes = [TupleType, ListType]
 import re
-# from this package
+import textwrap
+from types import TupleType, ListType
 from icalendar.caselessdict import CaselessDict
+SequenceTypes = [TupleType, ListType]
 
+
+def foldline(text, lenght=75, newline='\r\n'):
+    """ Make a string folded per RFC5545 (each line must be less than 75 octets)
+
+    >>> from icalendar.parser import foldline
+    >>> foldline('foo')
+    'foo'
+
+    >>> longtext = ("Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+    ...             "Vestibulum convallis imperdiet dui posuere.")
+    >>> foldline(longtext)
+    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum \\r\\n convallis imperdiet dui posuere.'
+
+#    >>> uuu = u'alfdkadäääüüaskd'
+#    >>> foldline(uuu, length=3)
+#    u'alf\ndka\nd\xe4\xe4\n\xe4\xfc\xfc\nask\nd'
+
+    """
+    return newline.join(
+            textwrap.wrap(text, lenght,
+                subsequent_indent=' ',
+                drop_whitespace=False,
+                break_long_words=True,
+                replace_whitespace=False
+                )
+            )
 
 #################################################################
 # Property parameter stuff
@@ -34,6 +59,8 @@ NAME = re.compile('[\w-]+')
 UNSAFE_CHAR = re.compile('[\x00-\x08\x0a-\x1f\x7F",:;]')
 QUNSAFE_CHAR = re.compile('[\x00-\x08\x0a-\x1f\x7F"]')
 FOLD = re.compile('([\r]?\n)+[ \t]{1}')
+NEWLINE = re.compile(r'\r?\n')
+
 
 def validate_token(name):
     match = NAME.findall(name)
@@ -102,7 +129,7 @@ class Parameters(CaselessDict):
 
     Simple parameter:value pair
     >>> p = Parameters(parameter1='Value1')
-    >>> str(p)
+    >>> p.to_ical()
     'PARAMETER1=Value1'
 
 
@@ -120,47 +147,47 @@ class Parameters(CaselessDict):
 
     Parameter with list of values must be seperated by comma
     >>> p = Parameters({'parameter1':['Value1', 'Value2']})
-    >>> str(p)
+    >>> p.to_ical()
     'PARAMETER1=Value1,Value2'
 
 
     Multiple parameters must be seperated by a semicolon
     >>> p = Parameters({'RSVP':'TRUE', 'ROLE':'REQ-PARTICIPANT'})
-    >>> str(p)
+    >>> p.to_ical()
     'ROLE=REQ-PARTICIPANT;RSVP=TRUE'
 
 
     Parameter values containing ',;:' must be double quoted
     >>> p = Parameters({'ALTREP':'http://www.wiz.org'})
-    >>> str(p)
+    >>> p.to_ical()
     'ALTREP="http://www.wiz.org"'
 
 
     list items must be quoted seperately
     >>> p = Parameters({'MEMBER':['MAILTO:projectA@host.com', 'MAILTO:projectB@host.com', ]})
-    >>> str(p)
+    >>> p.to_ical()
     'MEMBER="MAILTO:projectA@host.com","MAILTO:projectB@host.com"'
 
     Now the whole sheebang
     >>> p = Parameters({'parameter1':'Value1', 'parameter2':['Value2', 'Value3'],\
                           'ALTREP':['http://www.wiz.org', 'value4']})
-    >>> str(p)
+    >>> p.to_ical()
     'ALTREP="http://www.wiz.org",value4;PARAMETER1=Value1;PARAMETER2=Value2,Value3'
 
     We can also parse parameter strings
-    >>> Parameters.from_string('PARAMETER1=Value 1;param2=Value 2')
+    >>> Parameters.from_ical('PARAMETER1=Value 1;param2=Value 2')
     Parameters({'PARAMETER1': 'Value 1', 'PARAM2': 'Value 2'})
 
     Including empty strings
-    >>> Parameters.from_string('param=')
+    >>> Parameters.from_ical('param=')
     Parameters({'PARAM': ''})
 
     We can also parse parameter strings
-    >>> Parameters.from_string('MEMBER="MAILTO:projectA@host.com","MAILTO:projectB@host.com"')
+    >>> Parameters.from_ical('MEMBER="MAILTO:projectA@host.com","MAILTO:projectB@host.com"')
     Parameters({'MEMBER': ['MAILTO:projectA@host.com', 'MAILTO:projectB@host.com']})
 
     We can also parse parameter strings
-    >>> Parameters.from_string('ALTREP="http://www.wiz.org",value4;PARAMETER1=Value1;PARAMETER2=Value2,Value3')
+    >>> Parameters.from_ical('ALTREP="http://www.wiz.org",value4;PARAMETER1=Value1;PARAMETER2=Value2,Value3')
     Parameters({'PARAMETER1': 'Value1', 'ALTREP': ['http://www.wiz.org', 'value4'], 'PARAMETER2': ['Value2', 'Value3']})
     """
 
@@ -193,7 +220,7 @@ class Parameters(CaselessDict):
         return 'Parameters(' + dict.__repr__(self) + ')'
 
 
-    def __str__(self):
+    def to_ical(self):
         result = []
         items = self.items()
         items.sort() # To make doctests work
@@ -203,12 +230,13 @@ class Parameters(CaselessDict):
         return ';'.join(result)
 
 
-    def from_string(st, strict=False):
+    def from_ical(st, strict=False):
         "Parses the parameter format from ical text format"
-        try:
-            # parse into strings
-            result = Parameters()
-            for param in q_split(st, ';'):
+
+        # parse into strings
+        result = Parameters()
+        for param in q_split(st, ';'):
+            try:
                 key, val =  q_split(param, '=')
                 validate_token(key)
                 param_values = [v for v in q_split(val, ',')]
@@ -233,10 +261,10 @@ class Parameters(CaselessDict):
                         result[key] = vals[0]
                     else:
                         result[key] = vals
-            return result
-        except:
-            raise ValueError, 'Not a valid parameter string'
-    from_string = staticmethod(from_string)
+            except ValueError, e:
+                raise ValueError, '%r is not a valid parameter string: %s' % (param, e)
+        return result
+    from_ical = staticmethod(from_ical)
 
 
 #########################################
@@ -248,26 +276,36 @@ class Contentline(str):
     parts.
 
     >>> c = Contentline('Si meliora dies, ut vina, poemata reddit')
-    >>> str(c)
+    >>> c.to_ical()
     'Si meliora dies, ut vina, poemata reddit'
 
     A long line gets folded
     >>> c = Contentline(''.join(['123456789 ']*10))
-    >>> str(c)
-    '123456789 123456789 123456789 123456789 123456789 123456789 123456789 1234\\r\\n 56789 123456789 123456789 '
+    >>> c.to_ical()
+    '123456789 123456789 123456789 123456789 123456789 123456789 123456789 \\r\\n 123456789 123456789 123456789 '
 
     A folded line gets unfolded
-    >>> c = Contentline.from_string(str(c))
+    >>> c = Contentline.from_ical(c.to_ical())
     >>> c
     '123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 '
 
+    Newlines in a string get need to be preserved
+    >>> c = Contentline('1234\\n\\n1234')
+    >>> c.to_ical()
+    '1234\\n\\n1234'
+
     We do not fold within a UTF-8 character:
     >>> c = Contentline('This line has a UTF-8 character where it should be folded. Make sure it g\xc3\xabts folded before that character.')
-    >>> '\xc3\xab' in str(c)
+    >>> '\xc3\xab' in c.to_ical()
     True
 
+    Another test of the above
+    >>> c = Contentline('x' * 73 + '\xc3\xab' + '\\n ' + 'y' * 10)
+    >>> c.to_ical().count('\xc3')
+    1
+
     Don't fail if we fold a line that is exactly X times 74 characters long:
-    >>> c = str(Contentline(''.join(['x']*148)))
+    >>> c = Contentline(''.join(['x']*148)).to_ical()
 
     It can parse itself into parts. Which is a tuple of (name, params, vals)
 
@@ -282,7 +320,7 @@ class Contentline(str):
     >>> c = Contentline('ATTENDEE;CN=Max Rasmussen;ROLE=REQ-PARTICIPANT:MAILTO:maxm@example.com')
     >>> c.parts()
     ('ATTENDEE', Parameters({'ROLE': 'REQ-PARTICIPANT', 'CN': 'Max Rasmussen'}), 'MAILTO:maxm@example.com')
-    >>> str(c)
+    >>> c.to_ical()
     'ATTENDEE;CN=Max Rasmussen;ROLE=REQ-PARTICIPANT:MAILTO:maxm@example.com'
 
     and back again
@@ -320,17 +358,17 @@ class Contentline(str):
 
     And the traditional failure
     >>> c = Contentline('ATTENDEE;maxm@example.com')
-    >>> c.parts()
+    >>> c.parts()                                               #doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    ValueError: Content line could not be parsed into parts
+    ValueError: Content line could not be parsed into parts...
 
     Another failure:
     >>> c = Contentline(':maxm@example.com')
-    >>> c.parts()
+    >>> c.parts()                                               #doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    ValueError: Content line could not be parsed into parts
+    ValueError: Content line could not be parsed into parts...
 
     >>> c = Contentline('key;param=:value')
     >>> c.parts()
@@ -341,11 +379,11 @@ class Contentline(str):
     ('key', Parameters({'PARAM': 'pvalue'}), 'value')
 
     Should bomb on missing param:
-    >>> c = Contentline.from_string("k;:no param")
-    >>> c.parts()
+    >>> c = Contentline.from_ical("k;:no param")
+    >>> c.parts()                                               #doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    ValueError: Content line could not be parsed into parts
+    ValueError: Content line could not be parsed into parts...
 
     >>> c = Contentline('key;param=pvalue:value', strict=False)
     >>> c.parts()
@@ -362,7 +400,7 @@ class Contentline(str):
     >>> c = Contentline('key;param="pValue":value', strict=True)
     >>> c.parts()
     ('key', Parameters({'PARAM': 'pValue'}), 'value')
-    
+
     """
 
     def __new__(cls, st, strict=False):
@@ -372,10 +410,13 @@ class Contentline(str):
 
     def from_parts(parts):
         "Turns a tuple of parts into a content line"
-        (name, params, values) = [str(p) for p in parts]
+        (name, params, values) = parts
         try:
+            if values and not isinstance(values, str):
+                if hasattr(values, 'to_ical'):
+                    values = values.to_ical()
             if params:
-                return Contentline('%s;%s:%s' % (name, params, values))
+                return Contentline('%s;%s:%s' % (name, params.to_ical(), values))
             return Contentline('%s:%s' %  (name, values))
         except:
             raise ValueError(
@@ -406,50 +447,30 @@ class Contentline(str):
             validate_token(name)
             if name_split+1 == value_split:
                 raise ValueError, 'Invalid content line'
-            params = Parameters.from_string(self[name_split+1:value_split],
+            params = Parameters.from_ical(self[name_split+1:value_split],
                                             strict=self.strict)
             values = self[value_split+1:]
             return (name, params, values)
-        except:
-            raise ValueError, 'Content line could not be parsed into parts'
+        except ValueError, e:
+            raise ValueError, "Content line could not be parsed into parts: %r: %s" % (self, e)
 
-    def from_string(st, strict=False):
-        "Unfolds the content lines in an iCalendar into long content lines"
+    def from_ical(st, strict=False):
+        """ Unfolds the content lines in an iCalendar into long content lines.
+
+        """
         try:
             # a fold is carriage return followed by either a space or a tab
             return Contentline(FOLD.sub('', st), strict=strict)
         except:
             raise ValueError, 'Expected StringType with content line'
-    from_string = staticmethod(from_string)
+    from_ical = staticmethod(from_ical)
 
-    def __str__(self):
-        "Long content lines are folded so they are less than 75 characters wide"
-        l_line = len(self)
-        new_lines = []
-        start = 0
-        end = 74
-        while True:
-            if end >= l_line:
-                end = l_line
-            else:
-                # Check that we don't fold in the middle of a UTF-8 character:
-                # http://lists.osafoundation.org/pipermail/ietf-calsify/2006-August/001126.html
-                while True:
-                    char_value = ord(self[end])
-                    if char_value < 128 or char_value >= 192:
-                        # This is not in the middle of a UTF-8 character, so we
-                        # can fold here:
-                        break
-                    else:
-                        end -= 1
+    def to_ical(self):
+        """ Long content lines are folded so they are less than 75 characters
+        wide.
 
-            new_lines.append(self[start:end])
-            if end == l_line:
-                # Done
-                break
-            start = end
-            end = start + 74
-        return '\r\n '.join(new_lines)
+        """
+        return foldline(self, newline='\r\n')
 
 
 
@@ -460,29 +481,29 @@ class Contentlines(list):
     used instead.
 
     >>> c = Contentlines([Contentline('BEGIN:VEVENT\\r\\n')])
-    >>> str(c)
-    'BEGIN:VEVENT\\r\\n'
+    >>> c.to_ical()
+    'BEGIN:VEVENT\\r\\n\\r\\n'
 
     Lets try appending it with a 100 charater wide string
     >>> c.append(Contentline(''.join(['123456789 ']*10)+'\\r\\n'))
-    >>> str(c)
-    'BEGIN:VEVENT\\r\\n\\r\\n123456789 123456789 123456789 123456789 123456789 123456789 123456789 1234\\r\\n 56789 123456789 123456789 \\r\\n'
+    >>> c.to_ical()
+    'BEGIN:VEVENT\\r\\n\\r\\n123456789 123456789 123456789 123456789 123456789 123456789 123456789 \\r\\n 123456789 123456789 123456789 \\r\\n\\r\\n'
 
     Notice that there is an extra empty string in the end of the content lines.
     That is so they can be easily joined with: '\r\n'.join(contentlines)).
-    >>> Contentlines.from_string('A short line\\r\\n')
+    >>> Contentlines.from_ical('A short line\\r\\n')
     ['A short line', '']
-    >>> Contentlines.from_string('A faked\\r\\n  long line\\r\\n')
+    >>> Contentlines.from_ical('A faked\\r\\n  long line\\r\\n')
     ['A faked long line', '']
-    >>> Contentlines.from_string('A faked\\r\\n  long line\\r\\nAnd another lin\\r\\n\\te that is folded\\r\\n')
+    >>> Contentlines.from_ical('A faked\\r\\n  long line\\r\\nAnd another lin\\r\\n\\te that is folded\\r\\n')
     ['A faked long line', 'And another line that is folded', '']
     """
 
-    def __str__(self):
+    def to_ical(self):
         "Simply join self."
-        return '\r\n'.join(map(str, self))
+        return '\r\n'.join(l.to_ical() for l in self if l) + '\r\n'
 
-    def from_string(st):
+    def from_ical(st):
         "Parses a string into content lines"
         try:
             # a fold is carriage return followed by either a space or a tab
@@ -492,12 +513,12 @@ class Contentlines(list):
             return Contentlines(lines)
         except:
             raise ValueError, 'Expected StringType with content lines'
-    from_string = staticmethod(from_string)
+    from_ical = staticmethod(from_ical)
 
 
 # ran this:
 #    sample = open('./samples/test.ics', 'rb').read() # binary file in windows!
-#    lines = Contentlines.from_string(sample)
+#    lines = Contentlines.from_ical(sample)
 #    for line in lines[:-1]:
 #        print line.parts()
 

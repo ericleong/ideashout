@@ -9,10 +9,12 @@ These are the defined components.
 
 """
 
+import pytz
+from datetime import datetime
+
 # from python
 from types import ListType, TupleType
 SequenceTypes = (ListType, TupleType)
-import re
 
 # from this package
 from icalendar.caselessdict import CaselessDict
@@ -25,14 +27,13 @@ from icalendar.prop import TypesFactory, vText
 # The component factory
 
 class ComponentFactory(CaselessDict):
-    """
-    All components defined in rfc 2445 are registered in this factory class. To
-    get a component you can use it like this.
+    """ All components defined in rfc 2445 are registered in this factory
+    class. To get a component you can use it like this.
 
     >>> factory = ComponentFactory()
     >>> component = factory['VEVENT']
     >>> event = component(dtstart='19700101')
-    >>> event.as_string()
+    >>> event.to_ical()
     'BEGIN:VEVENT\\r\\nDTSTART:19700101\\r\\nEND:VEVENT\\r\\n'
 
     >>> factory.get('VCALENDAR', Component)
@@ -104,7 +105,7 @@ class Component(CaselessDict):
     >>> c = Component()
     >>> c.name = 'VCALENDAR'
     >>> c.add('attendee', 'Max M')
-    >>> c.as_string()
+    >>> c.to_ical()
     'BEGIN:VCALENDAR\\r\\nATTENDEE:Max M\\r\\nEND:VCALENDAR\\r\\n'
 
     >>> from icalendar.prop import vDatetime
@@ -114,7 +115,7 @@ class Component(CaselessDict):
     >>> e.name = 'VEVENT'
     >>> e.add('dtend', '20000102T000000', encode=0)
     >>> e.add('dtstart', '20000101T000000', encode=0)
-    >>> e.as_string()
+    >>> e.to_ical()
     'BEGIN:VEVENT\\r\\nDTEND:20000102T000000\\r\\nDTSTART:20000101T000000\\r\\nSUMMARY:A brief history of time\\r\\nEND:VEVENT\\r\\n'
 
     >>> c.add_component(e)
@@ -133,6 +134,23 @@ class Component(CaselessDict):
     >>> [i['dtstart'] for i in c.walk('VEVENT')]
     ['20000101T000000']
 
+    We can enumerate property items recursively with the property_items method.
+    >>> c.property_items()
+    [('BEGIN', 'VCALENDAR'), ('ATTENDEE', vCalAddress('Max M')), ('BEGIN', 'VEVENT'), ('DTEND', '20000102T000000'), ('DTSTART', '20000101T000000'), ('SUMMARY', 'A brief history of time'), ('END', 'VEVENT'), ('END', 'VCALENDAR')]
+
+    We can also enumerate property items just under the component.
+    >>> c.property_items(recursive=False)
+    [('BEGIN', 'VCALENDAR'), ('ATTENDEE', vCalAddress('Max M')), ('END', 'VCALENDAR')]
+    >>> sc = c.subcomponents[0]
+    >>> sc.property_items(recursive=False)
+    [('BEGIN', 'VEVENT'), ('DTEND', '20000102T000000'), ('DTSTART', '20000101T000000'), ('SUMMARY', 'A brief history of time'), ('END', 'VEVENT')]
+
+    Text fields which span multiple mulitple lines require proper indenting
+    >>> c = Calendar()
+    >>> c['description']=u'Paragraph one\\n\\nParagraph two'
+    >>> c.to_ical()
+    'BEGIN:VCALENDAR\\r\\nDESCRIPTION:Paragraph one\\n\\nParagraph two\\r\\nEND:VCALENDAR\\r\\n'
+
     INLINE properties have their values on one property line. Note the double
     quoting of the value with a colon in it.
     >>> c = Calendar()
@@ -140,7 +158,7 @@ class Component(CaselessDict):
     >>> c
     VCALENDAR({'RESOURCES': 'Chair, Table, "Room: 42"'})
 
-    >>> c.as_string()
+    >>> c.to_ical()
     'BEGIN:VCALENDAR\\r\\nRESOURCES:Chair, Table, "Room: 42"\\r\\nEND:VCALENDAR\\r\\n'
 
     The inline values must be handled by the get_inline() and set_inline()
@@ -177,12 +195,17 @@ class Component(CaselessDict):
     multiple = ()   # may occur more than once
     exclusive = ()  # These properties are mutually exclusive
     inclusive = ()  # if any occurs the other(s) MUST occur ('duration', 'repeat')
+    ignore_exceptions = False   # if True, and we cannot parse this
+                                # component, we will silently ignore
+                                # it, rather than let the exception
+                                # propagate upwards
 
     def __init__(self, *args, **kwargs):
         "Set keys to upper for initial dict"
         CaselessDict.__init__(self, *args, **kwargs)
         # set parameters here for properties that use non-default values
         self.subcomponents = [] # Components can be nested.
+        self.is_broken = False  # True iff we ignored an exception while parsing a property
 
 
 #    def non_complience(self, warnings=0):
@@ -205,10 +228,14 @@ class Component(CaselessDict):
     # handling of property values
 
     def _encode(self, name, value, cond=1):
-        # internal, for conditional convertion of values.
+        """ Conditional convertion of values.
+
+        """
+
         if cond:
             klass = types_factory.for_property(name)
             return klass(value)
+
         return value
 
 
@@ -218,9 +245,41 @@ class Component(CaselessDict):
         else:
             self[name] = self._encode(name, value, encode)
 
-
     def add(self, name, value, encode=1):
-        "If property exists append, else create and set it"
+        """ Add a property.
+
+        Test the for timezone correctness: dtstart should preserve it's
+        timezone, crated, dtstamp and last-modified must be in UTC.
+        >>> from datetime import datetime
+        >>> import pytz
+        >>> from icalendar.cal import Component
+        >>> comp = Component()
+        >>> comp.add('dtstart', datetime(2010,10,10,10,0,0,tzinfo=pytz.timezone("Europe/Vienna")))
+        >>> comp.add('created', datetime(2010,10,10,12,0,0))
+        >>> comp.add('dtstamp', datetime(2010,10,10,14,0,0,tzinfo=pytz.timezone("Europe/Vienna")))
+        >>> comp.add('last-modified', datetime(2010,10,10,16,0,0,tzinfo=pytz.utc))
+
+        >>> lines = comp.to_ical().splitlines()
+        >>> "DTSTART;TZID=Europe/Vienna;VALUE=DATE-TIME:20101010T100000" in lines
+        True
+        >>> "CREATED;VALUE=DATE-TIME:20101010T120000Z" in lines
+        True
+        >>> "DTSTAMP;VALUE=DATE-TIME:20101010T130000Z" in lines
+        True
+        >>> "LAST-MODIFIED;VALUE=DATE-TIME:20101010T160000Z" in lines
+        True
+
+        """
+        if isinstance(value, datetime) and\
+                name.lower() in ('dtstamp', 'created', 'last-modified'):
+            # RFC expects UTC for those... force value conversion.
+            if getattr(value, 'tzinfo', False) and value.tzinfo is not None:
+                value = value.astimezone(pytz.utc)
+            else:
+                # assume UTC for naive datetime instances
+                value = pytz.utc.localize(value)
+
+        # If property exists append, else create and set it.
         if name in self:
             oldval = self[name]
             value = self._encode(name, value, encode)
@@ -230,6 +289,10 @@ class Component(CaselessDict):
                 self.set(name, [oldval, value], encode=0)
         else:
             self.set(name, value, encode)
+        if getattr(value, 'tzinfo', False) and value.tzinfo is not None and value.tzinfo is not pytz.utc:
+            # set the timezone as a parameter to the property
+            tzid = value.tzinfo.zone
+            self[name].params.update({'TZID': tzid})
 
 
     def _decode(self, name, value):
@@ -308,15 +371,14 @@ class Component(CaselessDict):
     #####################
     # Generation
 
-    def property_items(self):
+    def property_items(self, recursive=True):
         """
         Returns properties in this component and subcomponents as:
         [(name, value), ...]
         """
         vText = types_factory['text']
-        properties = [('BEGIN', vText(self.name).ical())]
-        property_names = self.keys()
-        property_names.sort()
+        properties = [('BEGIN', vText(self.name).to_ical())]
+        property_names = self.sorted_keys()
         for name in property_names:
             values = self[name]
             if type(values) == ListType:
@@ -325,20 +387,32 @@ class Component(CaselessDict):
                     properties.append((name, value))
             else:
                 properties.append((name, values))
-        # recursion is fun!
-        for subcomponent in self.subcomponents:
-            properties += subcomponent.property_items()
-        properties.append(('END', vText(self.name).ical()))
+        if recursive:
+            # recursion is fun!
+            for subcomponent in self.subcomponents:
+                properties += subcomponent.property_items()
+        properties.append(('END', vText(self.name).to_ical()))
         return properties
 
 
-    def from_string(st, multiple=False):
+    def from_ical(st, multiple=False):
         """
         Populates the component recursively from a string
+
+        RecurrenceIDs may contain a TZID parameter, if so, they should create a tz localized datetime, otherwise, create a naive datetime
+        >>> componentStr = 'BEGIN:VEVENT\\nRECURRENCE-ID;TZID=America/Denver:20120404T073000\\nEND:VEVENT'
+        >>> component = Component.from_ical(componentStr)
+        >>> component['RECURRENCE-ID'].dt.tzinfo
+        <DstTzInfo 'America/Denver' MDT-1 day, 18:00:00 DST>
+
+        >>> componentStr = 'BEGIN:VEVENT\\nRECURRENCE-ID:20120404T073000\\nEND:VEVENT'
+        >>> component = Component.from_ical(componentStr)
+        >>> component['RECURRENCE-ID'].dt.tzinfo == None
+        True
         """
         stack = [] # a stack of components
         comps = []
-        for line in Contentlines.from_string(st): # raw parsing
+        for line in Contentlines.from_ical(st): # raw parsing
             if not line:
                 continue
             name, params, vals = line.parts()
@@ -361,20 +435,35 @@ class Component(CaselessDict):
                 if not stack: # we are at the end
                     comps.append(component)
                 else:
-                    stack[-1].add_component(component)
+                    if not component.is_broken:
+                        stack[-1].add_component(component)
             # we are adding properties to the current top of the stack
             else:
                 factory = types_factory.for_property(name)
-                vals = factory(factory.from_ical(vals))
-                vals.params = params
-                stack[-1].add(name, vals, encode=0)
+                component = stack[-1]
+                try:
+                    if name in ('DTSTART', 'DTEND','RECURRENCE-ID') and 'TZID' in params: # TODO: add DUE, FREEBUSY
+                        vals = factory(factory.from_ical(vals, params['TZID']))
+                    else:
+                        vals = factory(factory.from_ical(vals))
+                except ValueError:
+                    if not component.ignore_exceptions:
+                        raise
+                    component.is_broken = True
+                else:
+                    vals.params = params
+                    component.add(name, vals, encode=0)
+
         if multiple:
             return comps
-        if not len(comps) == 1:
+        if len(comps) > 1:
             raise ValueError('Found multiple components where '
-                             'only one is allowed')
+                             'only one is allowed: {st!r}'.format(**locals()))
+        if len(comps) < 1:
+            raise ValueError('Found no components where '
+                             'exactly one is required: {st!r}'.format(**locals()))
         return comps[0]
-    from_string = staticmethod(from_string)
+    from_ical = staticmethod(from_ical)
 
 
     def __repr__(self):
@@ -396,13 +485,8 @@ class Component(CaselessDict):
         return contentlines
 
 
-    def as_string(self):
-        return str(self.content_lines())
-
-
-    def __str__(self):
-        "Returns rendered iCalendar"
-        return self.as_string()
+    def to_ical(self):
+        return self.content_lines().to_ical()
 
 
 
@@ -414,11 +498,17 @@ class Event(Component):
 
     name = 'VEVENT'
 
+    canonical_order = (
+        'SUMMARY', 'DTSTART', 'DTEND', 'DURATION', 'DTSTAMP',
+        'UID', 'RECURRENCE-ID', 'SEQUENCE',
+        'RRULE' 'EXRULE', 'RDATE', 'EXDATE',
+    )
+
     required = ('UID',)
     singletons = (
         'CLASS', 'CREATED', 'DESCRIPTION', 'DTSTART', 'GEO',
-        'LAST-MOD', 'LOCATION', 'ORGANIZER', 'PRIORITY', 'DTSTAMP', 'SEQUENCE',
-        'STATUS', 'SUMMARY', 'TRANSP', 'URL', 'RECURID', 'DTEND', 'DURATION',
+        'LAST-MODIFIED', 'LOCATION', 'ORGANIZER', 'PRIORITY', 'DTSTAMP', 'SEQUENCE',
+        'STATUS', 'SUMMARY', 'TRANSP', 'URL', 'RECURRENCE-ID', 'DTEND', 'DURATION',
         'DTSTART',
     )
     exclusive = ('DTEND', 'DURATION', )
@@ -426,7 +516,7 @@ class Event(Component):
         'ATTACH', 'ATTENDEE', 'CATEGORIES', 'COMMENT','CONTACT', 'EXDATE',
         'EXRULE', 'RSTATUS', 'RELATED', 'RESOURCES', 'RDATE', 'RRULE'
     )
-
+    ignore_exceptions = True
 
 
 class Todo(Component):
@@ -436,8 +526,8 @@ class Todo(Component):
     required = ('UID',)
     singletons = (
         'CLASS', 'COMPLETED', 'CREATED', 'DESCRIPTION', 'DTSTAMP', 'DTSTART',
-        'GEO', 'LAST-MOD', 'LOCATION', 'ORGANIZER', 'PERCENT', 'PRIORITY',
-        'RECURID', 'SEQUENCE', 'STATUS', 'SUMMARY', 'UID', 'URL', 'DUE', 'DURATION',
+        'GEO', 'LAST-MODIFIED', 'LOCATION', 'ORGANIZER', 'PERCENT', 'PRIORITY',
+        'RECURRENCE-ID', 'SEQUENCE', 'STATUS', 'SUMMARY', 'UID', 'URL', 'DUE', 'DURATION',
     )
     exclusive = ('DUE', 'DURATION',)
     multiple = (
@@ -453,8 +543,8 @@ class Journal(Component):
 
     required = ('UID',)
     singletons = (
-        'CLASS', 'CREATED', 'DESCRIPTION', 'DTSTART', 'DTSTAMP', 'LAST-MOD',
-        'ORGANIZER', 'RECURID', 'SEQUENCE', 'STATUS', 'SUMMARY', 'UID', 'URL',
+        'CLASS', 'CREATED', 'DESCRIPTION', 'DTSTART', 'DTSTAMP', 'LAST-MODIFIED',
+        'ORGANIZER', 'RECURRENCE-ID', 'SEQUENCE', 'STATUS', 'SUMMARY', 'UID', 'URL',
     )
     multiple = (
         'ATTACH', 'ATTENDEE', 'CATEGORIES', 'COMMENT', 'CONTACT', 'EXDATE',
@@ -477,12 +567,13 @@ class FreeBusy(Component):
 class Timezone(Component):
 
     name = 'VTIMEZONE'
+    canonical_order = ('TZID', 'STANDARDC', 'DAYLIGHTC',)
 
     required = (
         'TZID', 'STANDARDC', 'DAYLIGHTC', 'DTSTART', 'TZOFFSETTO',
         'TZOFFSETFROM'
         )
-    singletons = ('LAST-MOD', 'TZURL', 'TZID',)
+    singletons = ('LAST-MODIFIED', 'TZURL', 'TZID',)
     multiple = ('COMMENT', 'RDATE', 'RRULE', 'TZNAME',)
 
 
@@ -514,16 +605,43 @@ class Calendar(Component):
     >>> event['uid'] = '42'
     >>> event.set('dtstart', datetime(2005,4,4,8,0,0))
     >>> cal.add_component(event)
-    >>> cal.subcomponents[0].as_string()
-    'BEGIN:VEVENT\\r\\nDTSTART:20050404T080000\\r\\nSUMMARY:Python meeting about calendaring\\r\\nUID:42\\r\\nEND:VEVENT\\r\\n'
+    >>> cal.subcomponents[0].to_ical()
+    'BEGIN:VEVENT\\r\\nSUMMARY:Python meeting about calendaring\\r\\nDTSTART;VALUE=DATE-TIME:20050404T080000\\r\\nUID:42\\r\\nEND:VEVENT\\r\\n'
 
     Write to disc
     >>> import tempfile, os
     >>> directory = tempfile.mkdtemp()
-    >>> open(os.path.join(directory, 'test.ics'), 'wb').write(cal.as_string())
+    >>> open(os.path.join(directory, 'test.ics'), 'wb').write(cal.to_ical())
+
+    Parsing a complete calendar from a string will silently ignore bogus events.
+    The bogosity in the following is the third EXDATE: it has an empty DATE.
+    >>> s = '\\r\\n'.join(('BEGIN:VCALENDAR',
+    ...                    'PRODID:-//Google Inc//Google Calendar 70.9054//EN',
+    ...                    'VERSION:2.0',
+    ...                    'CALSCALE:GREGORIAN',
+    ...                    'METHOD:PUBLISH',
+    ...                    'BEGIN:VEVENT',
+    ...                    'DESCRIPTION:Perfectly OK event',
+    ...                    'DTSTART;VALUE=DATE:20080303',
+    ...                    'DTEND;VALUE=DATE:20080304',
+    ...                    'RRULE:FREQ=DAILY;UNTIL=20080323T235959Z',
+    ...                    'EXDATE;VALUE=DATE:20080311',
+    ...                    'END:VEVENT',
+    ...                    'BEGIN:VEVENT',
+    ...                    'DESCRIPTION:Bogus event',
+    ...                    'DTSTART;VALUE=DATE:20080303',
+    ...                    'DTEND;VALUE=DATE:20080304',
+    ...                    'RRULE:FREQ=DAILY;UNTIL=20080323T235959Z',
+    ...                    'EXDATE;VALUE=DATE:20080311',
+    ...                    'EXDATE;VALUE=DATE:',
+    ...                    'END:VEVENT',
+    ...                    'END:VCALENDAR'))
+    >>> [e['DESCRIPTION'].to_ical() for e in Calendar.from_ical(s).walk('VEVENT')]
+    ['Perfectly OK event']
     """
 
     name = 'VCALENDAR'
+    canonical_order = ('VERSION', 'PRODID', 'CALSCALE', 'METHOD',)
     required = ('prodid', 'version', )
     singletons = ('prodid', 'version', )
     multiple = ('calscale', 'method', )

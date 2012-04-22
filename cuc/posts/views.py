@@ -17,7 +17,6 @@ from django.views.generic.list import ListView
 from icalendar.cal import Calendar, Event
 from icalendar.prop import vText, vCalAddress, vUri
 from posts.models import Post, Response, Tag, Location
-import datetime
 
 class TagView(ListView):
     # TODO: a slightly different page with the tag name?
@@ -239,7 +238,6 @@ class latestPostsFeed(Feed):
 
 def generate_calendar(request):
     """http://codespeak.net/icalendar/"""
-    from icalendar.prop import UTC
     
     cal = Calendar()
     cal.add('prodid', '-//Club Connect//ericleong.me//')
@@ -247,9 +245,12 @@ def generate_calendar(request):
     posts = Post.objects.order_by('-created')
     
     cal['X-WR-CALNAME'] = 'Club Connect Events'
+    cal['X-PUBLISH-TTL'] = 'PT12H'
     cal['CALSCALE'] = 'GREGORIAN'
+    cal['METHOD'] = 'PUBLISH'
     
     # TODO: separate out private events using a private URL?
+    # TODO: switch to using EDT
     for post in posts:
         if post.start_time:
             # Make sure we have a time
@@ -277,4 +278,4 @@ def generate_calendar(request):
         
             cal.add_component(event)
     
-    return HttpResponse(cal.as_string())
+    return HttpResponse(cal.to_ical(), content_type="text/calendar")
