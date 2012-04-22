@@ -70,7 +70,7 @@
 		{% for response in post.responses.all %}
 			<li class="response">
 				<div class="response-details">
-					<span class="response-author">{{ response.author }}</span>
+					<span class="response-author"><a href="{% url userprofile response.author %}">{{ response.author }}</a></span>
 					<span class="response-created">{{ response.created|naturaltime }}</span>
 				</div>
 				<div class="response-message">{{ response.message|escape }}</div>

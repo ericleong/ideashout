@@ -121,10 +121,6 @@ class PostView(DetailView):
         context['commit_form'] = commit_form
         
         return context
-    
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        return super(PostView, self).dispatch(*args, **kwargs)
 
 # Create Posts!
 class LinkCreationForm(forms.ModelForm):

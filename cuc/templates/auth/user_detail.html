@@ -22,6 +22,7 @@
 		{{ member.get_profile.bio }}
 	</div>
 	
+	{% if member.events.count > 0 %}
 	<div class="user-commits">
 		<h1 class="list-head">Commitments</h1>
 		<ul class="commitments">
@@ -53,7 +54,9 @@
 		{% endfor %}
 		</ul>
 	</div>
+	{% endif %}
 	
+	{% if member.posts.count > 0 %}
 	<div class="user-posts">
 		<h1 class="list-head">Posts</h1>
 		<ul class="posts">
@@ -73,5 +76,6 @@
 		{% endfor %}
 		</ul>
 	</div>
+	{% endif %}
 
 {% endblock %}
