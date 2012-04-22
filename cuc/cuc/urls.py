@@ -8,8 +8,9 @@ from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from posts.models import Post, UserProfile
 from posts.views import latestPostsFeed, PostView, generate_calendar, UserView, \
-    CreateLinkView, CreateEventView, TagView
+    CreateLinkView, CreateEventView, TagView, SignupForm
 import django.contrib.auth.views
+import settings
 
 # Uncomment the next two lines to enable the admin:
 admin.autodiscover()
@@ -30,7 +31,7 @@ urlpatterns = patterns('',
     url(r'^post/(?P<slug>.+)/$', PostView.as_view(model=Post, ), name="post"),
     #url(r'^post/(?P<slug>.+)/$', PostView.as_view(model=Post, )),
     
-    url(r'^post/$', RedirectView.as_view(url='/create/link')),
+    url(r'^post/$', RedirectView.as_view(url="create/link")),
     url(r'^create/link$', CreateLinkView.as_view(success_url="/"), name="create-link"),
     url(r'^create/event$', CreateEventView.as_view(success_url="/"), name="create-event"),
     
@@ -38,7 +39,7 @@ urlpatterns = patterns('',
     url(r'^tag/(?P<tag>.+)/$', TagView.as_view(model=Post, context_object_name="posts",), name="tag"),
     
     # Accounts
-    url(r'^signup$', CreateView.as_view(model=User, form_class=UserCreationForm, success_url="/login"), name="signup"),
+    url(r'^signup$', CreateView.as_view(model=User, form_class=SignupForm, success_url=settings.LOGIN_URL), name="signup"),
     url(r'^login$', django.contrib.auth.views.login, {'template_name': 'auth/login.html'}, name="login"),
     url(r'^user/(?P<slug>.+)/$', UserView.as_view(model=User, ), name="userprofile"),
     url(r'^logout$', django.contrib.auth.views.logout, name="logout"),

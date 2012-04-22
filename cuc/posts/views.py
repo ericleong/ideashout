@@ -1,8 +1,10 @@
 # Create your views here.
 
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.syndication.views import Feed
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.forms.widgets import Textarea, TextInput
 from django.http import HttpResponse
@@ -22,10 +24,25 @@ class TagView(ListView):
     def get_queryset(self):
         return Post.objects.order_by("-created").filter(tags__name=self.kwargs['tag'])
 
-        
+
 class UserView(DetailView):
     model = User
     slug_field = 'username'
+    
+class SignupForm(UserCreationForm):
+    
+    email = forms.EmailField(help_text="'cooper.edu' email required.")
+    
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if len(email) < 10 or email[-10:] != 'cooper.edu':
+            raise ValidationError("You need a 'cooper.edu' email address to sign up.")
+        
+        return email
+    
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email')
 
 class ResponseForm(forms.ModelForm):
         
