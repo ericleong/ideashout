@@ -156,6 +156,15 @@ ul.post-tags li {
 	margin-right: 6px;
 }
 
+/* events */
+.event-day {
+	margin-top: 24px;
+	margin-bottom: 12px;
+	
+	font-size: 16pt;
+	color: #C20B39;
+}
+
 /* responses */
 .post-responses {
     margin-top: 24px;
