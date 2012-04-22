@@ -102,9 +102,6 @@ class LinkCreationForm(forms.ModelForm):
         for tag_str in tags:
             tag, created = Tag.objects.get_or_create(name=tag_str) #@UnusedVariable
             tag_list.append(tag.pk)
-            
-        self.data["tags"] = tag_list
-        self.cleaned_data["tags"] = tag_list
         
         return tag_list
     
