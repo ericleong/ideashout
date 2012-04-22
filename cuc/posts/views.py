@@ -70,6 +70,9 @@ class SignupForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'email')
+        
+class CommitForm(forms.Form):
+    commit = forms.BooleanField(widget=forms.HiddenInput)        
 
 class ResponseForm(forms.ModelForm):
         
@@ -86,15 +89,22 @@ class PostView(DetailView):
     def post(self, request, *args, **kwargs):
         
         # TODO: fix this to be less hacky
-        try:
-            if request.POST:
-                form = ResponseForm(request.POST)
-                response = form.save(commit=False)
+        if request.POST:
+            comment_form = ResponseForm(request.POST)
+            if comment_form.is_valid():            
+                response = comment_form.save(commit=False)
                 response.author = request.user
                 response.post = self.get_object()
                 response.save()
-        except:
-            pass
+            else:
+                commit_form = CommitForm(request.POST)
+                
+                post = self.get_object()
+                if 'commit' in commit_form.data:
+                    if commit_form.data['commit'] == "True":   
+                        post.committed.add(self.request.user)
+                    else:
+                        post.committed.remove(self.request.user)
             
         #TODO: don't redirect.
         #return super(PostView, self).post(request, *args, **kwargs)
@@ -104,9 +114,11 @@ class PostView(DetailView):
         # Call the base implementation first to get a context
         context = super(PostView, self).get_context_data(**kwargs)
         
-        form = ResponseForm(initial={'author': self.request.user, 'post': self.object})
+        comment_form = ResponseForm(initial={'author': self.request.user, 'post': self.object})
+        commit_form = CommitForm(initial={'commit': not self.object.committed.filter(id=self.request.user.id).exists()})
         
-        context['comment_form'] = form
+        context['comment_form'] = comment_form
+        context['commit_form'] = commit_form
         
         return context
     
@@ -162,7 +174,7 @@ class CreateLinkView(CreateView):
 
 class EventCreationForm(LinkCreationForm):
     location = forms.CharField(max_length=100)
-    room = forms.CharField(max_length=100, required=False)
+    room = forms.CharField(max_length=100, required=False, label='Room/Floor (specify)')
     address = forms.CharField(max_length=200)
     link = forms.URLField(required=False)
     
@@ -266,7 +278,7 @@ def generate_calendar(request):
             
             if post.location:
                 if post.location.room:
-                    event['location'] = vText('%s (Room %s)' % (post.location.name, post.location.room))
+                    event['location'] = vText('%s (%s)' % (post.location.name, post.location.room))
                 else:
                     event['location'] = vText(post.location.name) 
                 

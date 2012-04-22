@@ -45,7 +45,7 @@ urlpatterns = patterns('',
     # Accounts
     url(r'^signup$', CreateView.as_view(model=User, form_class=SignupForm, success_url=settings.LOGIN_URL), name="signup"),
     url(r'^login$', django.contrib.auth.views.login, name="login"),
-    url(r'^user(?:s)?/(?P<slug>.+)/$', UserView.as_view(model=User, ), name="userprofile"),
+    url(r'^user(?:s)?/(?P<slug>.+)/$', UserView.as_view(model=User, context_object_name="member"), name="userprofile"),
     url(r'^logout$', django.contrib.auth.views.logout_then_login, name="logout"),
     url(r'^edit-profile$', EditUserView.as_view()),
 

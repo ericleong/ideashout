@@ -34,11 +34,11 @@ class Location(models.Model):
     room = models.CharField(max_length=100, blank=True)
     address = models.CharField(max_length=200)
     # TODO: not using these for now
-    latitude = models.FloatField(null=True)
-    longitude = models.FloatField(null=True)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
     
     def __unicode__(self):
-        return u'"%s" (%s) at %s' % (self.name, self.rooom, self.address)
+        return u'"%s" (%s) at %s' % (self.name, self.room, self.address)
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User)

@@ -1,37 +1,73 @@
 {% extends "base.html" %}
 {% load humanize %}
 
-{% block title %}{{ user.username }}{% endblock %}
+{% block title %}{{ member.username }}{% endblock %}
 
 {% block content %}
 
 	<div class="user-title">
-		<h1><a href="{% url userprofile user.username %}">{{ user.username }}</a></h1>
+		<h1><a href="{% url userprofile member.username %}">{{ member.username }}</a></h1>
 	</div>
 	
 	<div class="user-info">
-		{% if user.first_name %}
-		<div class="user-name">name: <span class="user-first-name">{{ user.first_name }}</span> <span class="user-last-name">{{ user.last_name }}</span></div>
+		{% if member.first_name %}
+		<div class="user-name">name: <span class="user-first-name">{{ member.first_name }}</span> <span class="user-last-name">{{ member.last_name }}</span></div>
 		{% endif %}
 		{% if user.is_authenicated %}
-		<div class="user-email">email: <a href="mailto:{{ user.email }}">{{ user.email }}</a></div>
+		<div class="user-email">email: <a href="mailto:{{ user.email }}">{{ member.email }}</a></div>
 		{% endif %}
 	</div>
 	
 	<div class="user-description">
-		{{ user.get_profile.bio }}
+		{{ member.get_profile.bio }}
+	</div>
+	
+	<div class="user-commits">
+		<h1 class="list-head">Commitments</h1>
+		<ul class="commitments">
+		{% for post in member.events.all %}
+			<li class="post">
+				<div class="post-title">
+					<a href="{% if post.link %}{{ post.link }}{% else %}{{ post.get_absolute_url }}{% endif %}">{{ post.title }}</a>
+				</div>
+				<div class="post-info">
+					{% if post.location %}
+					<div class="post-location">
+						<a href="http://maps.google.com/maps?q={{ post.location.address|urlencode }}">
+							<div class="post-location-name">{{ post.location.name|escapejs }}
+							{% if post.location.room %}<span class="post-location-room">({{ post.location.room|escapejs }})</span>{% endif %}
+							</div>
+							<div class="post-location-address">{{ post.location.address|escapejs }}</div>
+						</a> 
+					</div>
+					{% endif %}
+					{% if post.start_time %}
+					<div class="post-time">
+						<span class="post-start-time">{{ post.start_time|date:"f A l F j" }}</span>
+						 to 
+						<span class="post-end-time">{{ post.end_time|date:"f A l F j" }}</span>
+					</div>
+					{% endif %}
+				</div>
+			</li>
+		{% endfor %}
+		</ul>
 	</div>
 	
 	<div class="user-posts">
+		<h1 class="list-head">Posts</h1>
 		<ul class="posts">
-		{% for post in user.posts.all %}
+		{% for post in member.posts.all %}
 			<li class="post">
 				<div class="post-title">
 					<a href="{% if post.link %}{{ post.link }}{% else %}{{ post.get_absolute_url }}{% endif %}">{{ post.title }}</a>
 				</div>
 				<div class="post-details">
-					<span class="post-comments"><a href="{{ post.get_absolute_url }}">{{ post.responses.count }} responses</a></span>
 					<span class="post-created">{{ post.created|naturaltime }}</span>
+					with <span class="post-comments"><a href="{{ post.get_absolute_url }}">{{ post.responses.count }} responses</a></span>
+					{% if post.committed.count > 0 %}
+						and <span class="post-commits"><a href="{{ post.get_absolute_url }}">{{ post.committed.count }} commitment{{ post.committed.count|pluralize }}</a></span>
+					{% endif %}
 				</div>
 			</li>
 		{% endfor %}

@@ -19,7 +19,7 @@
 		<div class="post-location">
 			<a href="http://maps.google.com/maps?q={{ post.location.address|urlencode }}">
 				<div class="post-location-name">{{ post.location.name|escapejs }}
-				{% if post.location.room %}<span class="post-location-room">(Room {{ post.location.room|escapejs }})</span>{% endif %}
+				{% if post.location.room %}<span class="post-location-room">({{ post.location.room|escapejs }})</span>{% endif %}
 				</div>
 				<div class="post-location-address">{{ post.location.address|escapejs }}</div>
 			</a> 
@@ -45,19 +45,40 @@
 		</ul>
 	</div>
 	
+	{% if user.is_authenticated and post.start_time %}
+	{% if post.committed.count > 0 %}
+	<div class="post-commitment">	
+		<span class="post-committed">Committed: </span>
+		<ul class="post-commitments">
+			{% for commitment in post.committed.all %}
+				<li><a href="{% url userprofile commitment %}">{{ commitment.username }}</a></li>
+			{% endfor %}
+		</ul>
+	</div>
+	{% endif %}
+	<div class="post-commit">
+		<form action="" method="post" enctype="multipart/form-data">
+			{% csrf_token %}
+			{{ commit_form.as_p }} 
+			<input type="submit" value="{% if user in post.committed.all %}Uncommit{% else %}Commit{% endif %}" />
+		</form>
+	</div>
+	{% endif %}
+	
 	<div class="post-responses">
 		<ul class="responses">
 		{% for response in post.responses.all %}
 			<li class="response">
 				<div class="response-details">
-					<span class="response-author">{{ response.author }}</span><span class="response-created">{{ response.created|naturaltime }}</span>
+					<span class="response-author">{{ response.author }}</span>
+					<span class="response-created">{{ response.created|naturaltime }}</span>
 				</div>
 				<div class="response-message">{{ response.message|escape }}</div>
 			</li>
 		{% endfor %}
 		</ul>
 		
-		{% if user.is_authenticated %}
+		{% if user.is_authenticated %}		
 		<form action="" method="post" enctype="multipart/form-data">
 			{% csrf_token %} {{ comment_form.as_p }} 
 			<input type="submit" value="Respond" />

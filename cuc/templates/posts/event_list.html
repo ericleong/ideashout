@@ -4,10 +4,6 @@
 {% block title %}Events{% endblock %}
 
 {% block content %}
-<div class="post-feeds">
-	<a href="{% url web_calendar %}">Calendar</a>
-	<a href="{% url latest_rss %}">RSS</a>
-</div>
 
 <div class="post-types">
 	<span><a href="{% url links %}">Links</a></span>
@@ -25,16 +21,17 @@
 			<a href="{% if post.link %}{{ post.link }}{% else %}{{ post.get_absolute_url }}{% endif %}">{{ post.title }}</a>
 		</div>
 		<div class="post-details">
-			<span class="post-comments"><a href="{{ post.get_absolute_url }}">{{ post.responses.count }} responses</a></span>
 			<span class="post-author">posted by <a href="{% url userprofile post.author %}">{{ post.author }}</a></span>
 			<span class="post-created">{{ post.created|naturaltime }}</span>
+			with <span class="post-comments"><a href="{{ post.get_absolute_url }}">{{ post.responses.count }} response{{ post.responses.count|pluralize }}</a></span>
+			and <span class="post-commits"><a href="{{ post.get_absolute_url }}">{{ post.committed.count }} commitment{{ post.committed.count|pluralize }}</a></span>
 		</div>
 		<div class="post-info">
 			{% if post.location %}
 			<div class="post-location">
 				<a href="http://maps.google.com/maps?q={{ post.location.address|urlencode }}">
 					<div class="post-location-name">{{ post.location.name|escapejs }}
-					{% if post.location.room %}<span class="post-location-room">(Room {{ post.location.room|escapejs }})</span>{% endif %}
+					{% if post.location.room %}<span class="post-location-room">({{ post.location.room|escapejs }})</span>{% endif %}
 					</div>
 					<div class="post-location-address">{{ post.location.address|escapejs }}</div>
 				</a> 

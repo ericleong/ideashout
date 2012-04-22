@@ -124,6 +124,8 @@ h1 {
 	position: relative;
 }
 
+/* events */
+
 .post-end-time {
 	margin-left: 12px;
 	margin-top: 6px;
@@ -154,6 +156,27 @@ ul.post-tags li {
 	
 	margin-left: 6px;
 	margin-right: 6px;
+}
+
+/* commitment */
+
+.post-commitment {
+    margin-top: 24px;
+    font-size: 14pt;
+}
+
+.post-committed {
+    display: inline-block;
+}
+
+.post-commitments li {
+    display: inline-block;
+    margin-left: 6px;
+    margin-right: 6px;
+}
+
+ul.post-commitments {
+    display: inline-block
 }
 
 /* events */
@@ -329,6 +352,15 @@ input[type=submit]:hover {
 .post-autocomplete-room {
 	margin-left: 12px;
 	font-size: 11pt;
+}
+
+/* profile */
+.list-head {
+	margin-top: 24px;
+	margin-bottom: 12px;
+	
+	font-size: 16pt;
+	color: #C20B39;
 }
 
 /* css for timepicker */
