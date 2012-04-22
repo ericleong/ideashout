@@ -207,7 +207,10 @@ def generate_calendar(request):
             event['url'] = vUri(post.get_absolute_url())
             
             if post.location:
-                event['location'] = vText(post.location.name)
+                if post.location.room:
+                    event['location'] = vText('%s (Room %s)' % (post.location.name, post.location.room))
+                else:
+                    event['location'] = vText(post.location.name) 
                 
             for commit in post.committed.all():
                 attendee = vCalAddress('MAILTO:' + commit.email)
