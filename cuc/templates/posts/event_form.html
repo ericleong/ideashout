@@ -44,7 +44,7 @@ $(function(){
 		return $( "<li></li>" )
 		.data( "item.autocomplete", item )
 		.append( "<a><span class='post-autocomplete-location'>" + item.value + "</span>" +
-				"<span class='post-autocomplete-room'>(Room " + item.room + ")</span>" +
+				(item.room ? "<span class='post-autocomplete-room'>(Room " + item.room + ")</span>" : "") +
 				"<br><span class='post-autocomplete-address'>" + item.address + "</span></a>" )
 		.appendTo( ul );
 	};
