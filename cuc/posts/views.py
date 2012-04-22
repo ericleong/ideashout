@@ -95,6 +95,18 @@ class LinkCreationForm(forms.ModelForm):
             'description': Textarea(attrs={'cols': 30, 'rows': 4}),
             'tags': TextInput(),
         }
+        
+    def clean_tags(self):
+        tag_list = []
+        tags = self.cleaned_data["tags"].split(",")
+        for tag_str in tags:
+            tag, created = Tag.objects.get_or_create(name=tag_str) #@UnusedVariable
+            tag_list.append(tag.pk)
+            
+        self.data["tags"] = tag_list
+        self.cleaned_data["tags"] = tag_list
+        
+        return tag_list
     
 class CreateLinkView(CreateView):
     model = Post
@@ -107,15 +119,6 @@ class CreateLinkView(CreateView):
         # Add in a QuerySet of all the tags
         context['tags'] = Tag.objects.all()
         return context
-    
-    def cleaned_tags(self):
-        tag_list = []
-        tags = self.cleaned_data["tags"].split(",")
-        for tag_str in tags:
-            tag, created = Tag.objects.get_or_create(name=tag_str) #@UnusedVariable
-            tag_list.append(tag.pk)
-            
-        return tag_list
     
     def form_valid(self, form):
         form.cleaned_data["author"] = self.request.user
