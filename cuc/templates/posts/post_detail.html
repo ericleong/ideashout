@@ -18,7 +18,9 @@
 		{% if post.location %}
 		<div class="post-location">
 			<a href="http://maps.google.com/maps?q={{ post.location.address|urlencode }}">
-				<div class="post-location-name">{{ post.location.name|escapejs }}<span class="post-location-room">(Room {{ post.location.room|escapejs }})</span></div>
+				<div class="post-location-name">{{ post.location.name|escapejs }}
+				{% if post.location.room %}<span class="post-location-room">(Room {{ post.location.room|escapejs }})</span>{% endif %}
+				</div>
 				<div class="post-location-address">{{ post.location.address|escapejs }}</div>
 			</a> 
 		</div>
