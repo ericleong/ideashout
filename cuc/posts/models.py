@@ -36,10 +36,16 @@ class Location(models.Model):
     # TODO: not using these for now
     latitude = models.FloatField(null=True)
     longitude = models.FloatField(null=True)
+    
+    def __unicode__(self):
+        return u'"%s" (%s) at %s' % (self.name, self.rooom, self.address)
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User)
     bio = models.TextField(blank=True)
+    
+    def __unicode__(self):
+        return u"%s's profile" % (self.user.username, )
     
 class Tag(models.Model):
     name = models.CharField(max_length=30)

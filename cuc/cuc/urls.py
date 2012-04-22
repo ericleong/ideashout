@@ -4,11 +4,11 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.views.generic.base import RedirectView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 from posts.models import Post, UserProfile
 from posts.views import latestPostsFeed, PostView, generate_calendar, UserView, \
-    CreateLinkView, CreateEventView, TagView, SignupForm
+    CreateLinkView, CreateEventView, TagView, SignupForm, EditUserView
 import django.contrib.auth.views
 import settings
 
@@ -41,8 +41,9 @@ urlpatterns = patterns('',
     # Accounts
     url(r'^signup$', CreateView.as_view(model=User, form_class=SignupForm, success_url=settings.LOGIN_URL), name="signup"),
     url(r'^login$', django.contrib.auth.views.login, {'template_name': 'auth/login.html'}, name="login"),
-    url(r'^user/(?P<slug>.+)/$', UserView.as_view(model=User, ), name="userprofile"),
+    url(r'^user(?:s)?/(?P<slug>.+)/$', UserView.as_view(model=User, ), name="userprofile"),
     url(r'^logout$', django.contrib.auth.views.logout, name="logout"),
+    url(r'^edit-profile$', EditUserView.as_view()),
 
     # Feeds
     url(r'^rss(?:\.rss)?$', latestPostsFeed(), name="latest_rss"),

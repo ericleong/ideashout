@@ -1,6 +1,7 @@
 # Create your views here.
 
 from django import forms
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.syndication.views import Feed
@@ -9,8 +10,9 @@ from django.core.urlresolvers import reverse
 from django.forms.widgets import Textarea, TextInput
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.utils.decorators import method_decorator
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 from icalendar.cal import Calendar, Event
 from icalendar.prop import vText, vCalAddress, vUri
@@ -28,6 +30,32 @@ class TagView(ListView):
 class UserView(DetailView):
     model = User
     slug_field = 'username'
+
+class EditUserForm(forms.ModelForm):
+    bio = forms.CharField(widget = Textarea(attrs={'cols': 40, 'rows': 3}))
+    
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email', 'bio')
+
+class EditUserView(UpdateView):
+    model = User
+    form_class = EditUserForm
+    template_name = "auth/user_edit_form.html"
+    
+    def get_object(self):
+        return self.request.user
+    
+    def form_valid(self, form):
+        profile = self.request.user.get_profile()
+        profile.bio = form.cleaned_data["bio"]
+        profile.save()
+        
+        return super(EditUserView, self).form_valid(form)
+    
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(EditUserView, self).dispatch(*args, **kwargs)
     
 class SignupForm(UserCreationForm):
     
@@ -82,6 +110,10 @@ class PostView(DetailView):
         context['comment_form'] = form
         
         return context
+    
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(PostView, self).dispatch(*args, **kwargs)
 
 # Create Posts!
 class LinkCreationForm(forms.ModelForm):
@@ -124,6 +156,10 @@ class CreateLinkView(CreateView):
         self.object.author = self.request.user
         
         return super(CreateLinkView, self).form_valid(form)
+    
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(CreateLinkView, self).dispatch(*args, **kwargs)
 
 class EventCreationForm(LinkCreationForm):
     location = forms.CharField(max_length=100)
@@ -160,6 +196,10 @@ class CreateEventView(CreateLinkView):
         # Add in a QuerySet of all the locations
         context['locations'] = Location.objects.all()
         return context
+    
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(CreateEventView, self).dispatch(*args, **kwargs)
     
 
 class latestPostsFeed(Feed):

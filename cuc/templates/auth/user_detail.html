@@ -9,6 +9,15 @@
 		<h1><a href="{% url userprofile user.username %}">{{ user.username }}</a></h1>
 	</div>
 	
+	<div class="user-info">
+		{% if user.first_name %}
+		<div class="user-name">name: <span class="user-first-name">{{ user.first_name }}</span> <span class="user-last-name">{{ user.last_name }}</span></div>
+		{% endif %}
+		{% if user.is_authenicated %}
+		<div class="user-email">email: <a href="mailto:{{ user.email }}">{{ user.email }}</a></div>
+		{% endif %}
+	</div>
+	
 	<div class="user-description">
 		{{ user.get_profile.bio }}
 	</div>

@@ -1,0 +1,13 @@
+{% extends "post-create.html" %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block form %}
+<div class="post-title">
+	<h1>Edit Profile</h1>
+</div>
+
+<form action="" method="post" enctype="multipart/form-data">
+	{% csrf_token %} {{ form.as_p }} <input type="submit" value="Save Profile" />
+</form>
+{% endblock %}
