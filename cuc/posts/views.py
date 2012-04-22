@@ -278,4 +278,4 @@ def generate_calendar(request):
         
             cal.add_component(event)
     
-    return HttpResponse(cal.to_ical(), content_type="text/calendar")
+    return HttpResponse(cal.to_ical().replace('\n', '\r\n'), content_type="text/calendar")
