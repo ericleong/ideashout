@@ -15,6 +15,14 @@
 	
 	{% if post.start_time %}
 	<div class="post-info">
+		{% if post.location %}
+		<div class="post-location">
+			<a href="http://maps.google.com/maps?q={{ post.location.address|urlencode }}">
+				<div class="post-location-name">{{ post.location.name|escapejs }}<span class="post-location-room">(Room {{ post.location.room|escapejs }})</span></div>
+				<div class="post-location-address">{{ post.location.address|escapejs }}</div>
+			</a> 
+		</div>
+		{% endif %}
 		{% if post.start_time %}
 		<div class="post-time">
 			<span class="post-start-time">{{ post.start_time|date:"f A l F j" }}</span>
@@ -22,15 +30,10 @@
 			<span class="post-end-time">{{ post.end_time|date:"f A l F j" }}</span>
 		</div>
 		{% endif %}
-		{% if post.location %}
-		<div class="post-location">
-			{{ post.location.name }} 
-		</div>
-		{% endif %}
 	</div>
 	{% endif %}
 	
-	<div class="post-description">{{ post.description }}</div>
+	<div class="post-description">{{ post.description|urlize }}</div>
 	
 	<div class="post-metadata">
 		<ul class="post-tags">
@@ -47,7 +50,7 @@
 				<div class="response-details">
 					<span class="response-author">{{ response.author }}</span><span class="response-created">{{ response.created|naturaltime }}</span>
 				</div>
-				<div class="response-message">{{ response.message }}</div>
+				<div class="response-message">{{ response.message|escape }}</div>
 			</li>
 		{% endfor %}
 		</ul>
@@ -55,7 +58,7 @@
 		{% if user.is_authenticated %}
 		<form action="" method="post" enctype="multipart/form-data">
 			{% csrf_token %} {{ comment_form.as_p }} 
-			<input type="submit" value="Submit" />
+			<input type="submit" value="Respond" />
 		</form>
 		{% endif %}
 	</div>

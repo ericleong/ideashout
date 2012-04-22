@@ -44,6 +44,6 @@ urlpatterns = patterns('',
     url(r'^logout$', django.contrib.auth.views.logout, name="logout"),
 
     # Feeds
-    url(r'^rss$', latestPostsFeed(), name="latest_rss"),
+    url(r'^rss(?:\.rss)?$', latestPostsFeed(), name="latest_rss"),
     url(r'^ical(?:\.ics)?$', generate_calendar, name="web_calendar")
 )

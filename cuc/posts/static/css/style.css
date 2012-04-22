@@ -50,6 +50,9 @@ h1 {
     margin-left: auto;
     margin-right: auto;
     position: relative;
+    
+    padding-left: 12px;
+    padding-right: 12px;
 }
 
 .header {
@@ -114,6 +117,30 @@ h1 {
 	font-size: 11pt;
 	margin-top: 6px;
 	position: relative;
+}
+
+.post-info {
+	position: relative;
+}
+
+.post-end-time {
+	margin-left: 12px;
+	margin-top: 6px;
+	display: block;
+}
+
+.post-location {
+	float: right;
+}
+
+.post-location-address {
+	margin-top: 6px;
+	font-size: 12pt;
+}
+
+.post-location-room {
+	margin-left: 12px;
+	font-size: 12pt;
 }
 
 ul.post-tags {
@@ -214,12 +241,28 @@ form p label {
     margin-bottom: 6px;
 }
 
+form p label[for="id_private"]  {
+	display: inline;
+}
+
 form p input[type="text"] {
     margin-top: 6px;
     display: block;
     
     font-family: 'Maven Pro', sans-serif;
     font-size: 16pt;
+}
+
+form p input[type="text"][maxlength="100"] {
+    width: 100%;
+}
+
+form p input[type="text"][maxlength="200"] {
+    width: 100%;
+}
+
+#id_room {
+	width: 20%;
 }
 
 #id_tags {
@@ -255,19 +298,27 @@ form p textarea {
 
 input[type=submit] {
     margin-top: 12px;
-    padding: 4px 10px 4px 10px;
+    padding: 2px 8px 2px 8px;
     
     font-family: 'Maven Pro', sanserif;
-    font-size: 14pt;
+    font-size: 12pt;
     
     background-color: white;
     color: #C20B39;
     border: 2px solid #13A0D8;
-    border-radius: 6px;
 }
 
 input[type=submit]:hover {
 	border-color: #00CEFD;
+}
+
+.post-autocomplete-address {
+	font-size: 10pt;
+}
+
+.post-autocomplete-room {
+	margin-left: 12px;
+	font-size: 11pt;
 }
 
 /* css for timepicker */

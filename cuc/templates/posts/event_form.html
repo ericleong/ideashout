@@ -16,6 +16,38 @@
 $(function(){
 	$('#id_start_time').datetimepicker();
 	$('#id_end_time').datetimepicker();
+	
+	var locations = [
+	                 {% for location in locations %}
+	                 {
+	                	 value: "{{ location.name }}",
+	                	 room: "{{ location.room }}",
+	                	 address: "{{ location.address }}",
+	                 },
+	                 {% endfor %}
+	                 ]
+	
+	$('#id_location').autocomplete({
+		minLength: 0,
+		source: locations,
+		focus: function( event, ui ) {
+			$( "#id_location" ).val( ui.item.value );
+			return false;
+		},
+		select: function( event, ui ) {
+			$( "#id_location" ).val( ui.item.value );
+			$( "#id_room" ).val( ui.item.room );
+			$( "#id_address" ).val( ui.item.address );
+			return false;
+		}
+	}).data( "autocomplete" )._renderItem = function( ul, item ) {
+		return $( "<li></li>" )
+		.data( "item.autocomplete", item )
+		.append( "<a><span class='post-autocomplete-location'>" + item.value + "</span>" +
+				"<span class='post-autocomplete-room'>(Room " + item.room + ")</span>" +
+				"<br><span class='post-autocomplete-address'>" + item.address + "</span></a>" )
+		.appendTo( ul );
+	};
 });
 
 $(document).ready(function(){
@@ -23,7 +55,7 @@ $(document).ready(function(){
 		caseSensitive: false,
 		allowSpaces: true,
 		removeConfirmation: true,
-		availableTags: [{% for tag in tags %}"{{ tag }}"{% if not forloop.last %},{% endif %}{% endfor %}]
+		availableTags: [{% for tag in tags %}"{{ tag }}",{% endfor %}]
 	});
 });
 </script>

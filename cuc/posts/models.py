@@ -33,8 +33,9 @@ class Location(models.Model):
     name = models.CharField(max_length=100)
     room = models.CharField(max_length=100)
     address = models.CharField(max_length=200)
-    latitude = models.FloatField()
-    longitude = models.FloatField()
+    # TODO: not using these for now
+    latitude = models.FloatField(null=True)
+    longitude = models.FloatField(null=True)
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User)
