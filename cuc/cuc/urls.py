@@ -45,7 +45,8 @@ urlpatterns = patterns('',
     url(r'^login$', django.contrib.auth.views.login, name="login"),
     url(r'^user(?:s)?/(?P<slug>.+)/$', UserView.as_view(model=User, context_object_name="member"), name="userprofile"),
     url(r'^logout$', django.contrib.auth.views.logout_then_login, name="logout"),
-    url(r'^edit-profile$', EditUserView.as_view()),
+    url(r'^edit-profile$', EditUserView.as_view(), name="edit-profile"),
+    url(r'^directory$', ListView.as_view(model=User, queryset=User.objects.order_by("last_name"), context_object_name="users",), name="directory"),
 
     # Feeds
     url(r'^rss(?:\.rss)?$', latestPostsFeed(), name="latest_rss"),

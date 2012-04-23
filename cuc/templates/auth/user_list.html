@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Directory{% endblock %}
+
+{% block content %}
+
+<div class="post-title">
+	<h1>Directory</h1>
+</div>
+
+<ul class="users">
+	{% for user in users %}
+	{% ifchanged user.last_name|slice:":1" %}
+	<div class="users-letter">{{ user.last_name|slice:":1" }}</div>
+	{% endifchanged %}
+	<li class="users-user">
+		<div class="users-user-title"><a href="{% url userprofile user %}">{{ user.first_name }} {{ user.last_name }}</a></div>
+		<div class="users-user-info">{{ user.username }}</div>
+	</li>
+	{% endfor %}
+</ul>
+
+{% endblock %}

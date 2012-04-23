@@ -76,6 +76,11 @@ h1 {
     font-size: 24pt;
 }
 
+#navigation a {
+	margin-left: 12px;
+	margin-right: 12px;
+}
+
 /* posts */
 .post-feeds {
 	position: absolute;
@@ -243,6 +248,29 @@ li.response {
 
 .user-posts {
 	margin-top: 24px;
+}
+
+/* users */
+.users {
+    margin-top: 12px;
+}
+
+.users-user {
+    margin-top: 12px;
+    font-size: 14pt;
+}
+
+.users-letter {
+	margin-top: 24px;
+	margin-bottom: 12px;
+	
+	font-size: 16pt;
+	color: #C20B39;
+}
+
+.users-user-info {
+	margin-top: 2px;
+	font-size: 11pt;
 }
 
 /* posting css */

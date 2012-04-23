@@ -13,8 +13,8 @@
 		{% if member.first_name %}
 		<div class="user-name">name: <span class="user-first-name">{{ member.first_name }}</span> <span class="user-last-name">{{ member.last_name }}</span></div>
 		{% endif %}
-		{% if user.is_authenicated %}
-		<div class="user-email">email: <a href="mailto:{{ user.email }}">{{ member.email }}</a></div>
+		{% if user.is_authenticated %}
+		<div class="user-email">email: <a href="mailto:{{ member.email }}">{{ member.email }}</a></div>
 		{% endif %}
 	</div>
 	
