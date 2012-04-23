@@ -45,6 +45,9 @@ class EditUserView(UpdateView):
     def get_object(self):
         return self.request.user
     
+    def get_initial(self):
+        return {'bio': self.request.user.get_profile().bio }
+    
     def form_valid(self, form):
         profile = self.request.user.get_profile()
         profile.bio = form.cleaned_data["bio"]

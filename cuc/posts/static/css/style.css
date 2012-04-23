@@ -5,24 +5,24 @@ body {
 
 a {
 	text-decoration: none;
-	color: #00CEFD;
+	color: #13A0D8;
 }
 
 a:link {
 	text-decoration: none;
-	color: #00CEFD;
+	color: #13A0D8;
 }
 
 a:visited {
-	color: #13A0D8;
+	color: #7B86E2;
 }
 
 a:hover {
-	color: #13A0D8;
+	color: #7B86E2;
 }
 
 h1 {
-	color: #13A0D8;
+	color: #7B86E2;
 }
 
 /* specifics */
@@ -37,8 +37,12 @@ h1 {
 	font-size: 56pt;
 }
 
-#logo a:visited {
-	color: #C20B39;
+a.stationary:visited {
+	color: #13A0D8;
+}
+
+a.stationary:hover {
+	color: #7B86E2;
 }
 
 #logo a:visited {
@@ -152,7 +156,7 @@ h1 {
 }
 
 ul.post-tags {
-	color: #00CEFD;
+	color: #13A0D8;
 	position: absolute;
 	right: 0px;
 }
@@ -231,6 +235,12 @@ li.response {
 	font-size: 24pt;
 	
 	margin-bottom: 6px;
+}
+
+.user-info {
+	margin-top: 12px;
+	font-size: 14pt;
+	line-height: 1.25;
 }
 
 .user-details {
@@ -366,11 +376,11 @@ input[type=submit] {
     
     background-color: white;
     color: #C20B39;
-    border: 2px solid #13A0D8;
+    border: 2px solid #7B86E2;
 }
 
 input[type=submit]:hover {
-	border-color: #00CEFD;
+	border-color: #13A0D8;
 }
 
 .post-autocomplete-address {

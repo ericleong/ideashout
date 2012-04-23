@@ -5,11 +5,11 @@
 
 {% block content %}
 <div class="post-feeds">
-	<a href="{% url web_calendar %}">Calendar</a> / <a href="{% url latest_rss %}">RSS</a>
+	<a class="stationary" href="{% url web_calendar %}">Calendar</a> / <a class="stationary" href="{% url latest_rss %}">RSS</a>
 </div>
 <div class="post-types">
-	<span><a href="{% url links %}">Links</a></span>
-	<span><a href="{% url events %}">Events</a></span>
+	<span><a class="stationary" href="{% url links %}">Links</a></span>
+	<span><a class="stationary" href="{% url events %}">Events</a></span>
 </div>
 <ul class="posts">
 	{% for post in posts %}

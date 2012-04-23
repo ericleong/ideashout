@@ -11,15 +11,15 @@
 	
 	<div class="user-info">
 		{% if member.first_name %}
-		<div class="user-name">name: <span class="user-first-name">{{ member.first_name }}</span> <span class="user-last-name">{{ member.last_name }}</span></div>
+		<div class="user-name"><span class="user-first-name">{{ member.first_name }}</span> <span class="user-last-name">{{ member.last_name }}</span></div>
 		{% endif %}
 		{% if user.is_authenticated %}
-		<div class="user-email">email: <a href="mailto:{{ member.email }}">{{ member.email }}</a></div>
+		<div class="user-email"><a href="mailto:{{ member.email }}">{{ member.email }}</a></div>
 		{% endif %}
 	</div>
 	
 	<div class="user-description">
-		{{ member.get_profile.bio }}
+		{{ member.get_profile.bio|urlize }}
 	</div>
 	
 	{% if member.events.count > 0 %}

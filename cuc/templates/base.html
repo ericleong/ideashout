@@ -19,11 +19,11 @@
 			<div id="logo"><a href="/">Club Connect</a></div>			
 			<div id="navigation">
 				{% if user.is_authenticated %}
-				<a href="{% url directory %}">Directory</a>
-				<a href="{% url edit-profile %}">Profile</a>
-				<a href="{% url create-link %}">Post!</a>
+				<a class="stationary" href="{% url directory %}">Directory</a>
+				<a class="stationary" href="{% url edit-profile %}">Profile</a>
+				<a class="stationary" href="{% url create-link %}">Post!</a>
 				{% else %}
-				<a href="{% url login %}">Log in</a>
+				<a class="stationary" href="{% url login %}">Log in</a>
 				{% endif %}
 			</div>
 		</div>
