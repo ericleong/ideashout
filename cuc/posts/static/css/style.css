@@ -22,7 +22,7 @@ a:hover {
 }
 
 h1 {
-	color: #7B86E2;
+	color: #13A0D8;
 }
 
 /* specifics */
@@ -376,11 +376,11 @@ input[type=submit] {
     
     background-color: white;
     color: #C20B39;
-    border: 2px solid #7B86E2;
+    border: 2px solid #13A0D8;
 }
 
 input[type=submit]:hover {
-	border-color: #13A0D8;
+	border-color: #7B86E2;
 }
 
 .post-autocomplete-address {
