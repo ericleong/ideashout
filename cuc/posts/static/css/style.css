@@ -71,6 +71,12 @@ a.stationary:hover {
     
     width: 100%;
 }
+
+.footer {
+	font-size: 10pt;
+	margin-top: 48px;
+	margin-bottom: 12px;
+}
 #navigation {
     display: inline-block;
     vertical-align: center;
