@@ -6,7 +6,8 @@ from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from posts.models import Post
 from posts.views import latestPostsFeed, PostView, generate_calendar, UserView, \
-    CreateLinkView, CreateEventView, TagView, SignupForm, EditUserView
+    CreateLinkView, CreateEventView, TagView, SignupForm, EditUserView, \
+    CreateIdeaView
 import django.contrib.auth.views
 import settings
 
@@ -36,6 +37,7 @@ urlpatterns = patterns('',
     #url(r'^post/(?P<slug>.+)/$', PostView.as_view(model=Post, )),
     
     url(r'^post/$', RedirectView.as_view(url="create/link")),
+    url(r'^create/idea$', CreateIdeaView.as_view(success_url="/"), name="create-idea"),
     url(r'^create/link$', CreateLinkView.as_view(success_url="/"), name="create-link"),
     url(r'^create/event$', CreateEventView.as_view(success_url="/"), name="create-event"),
     

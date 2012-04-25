@@ -27,6 +27,10 @@ h1 {
 
 /* specifics */
 
+.errorlist {
+	color: #C20B39;
+}
+
 #logo {
 	display: inline-block;
 }

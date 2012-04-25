@@ -171,6 +171,35 @@ class CreateLinkView(CreateView):
     def dispatch(self, *args, **kwargs):
         return super(CreateLinkView, self).dispatch(*args, **kwargs)
 
+class IdeaCreationForm(forms.ModelForm):
+    tags = forms.CharField(help_text="")
+    
+    class Meta:
+        model = Post
+        fields = ('title', 'description', 'tags', 'private')
+        widgets = {
+            'description': Textarea(attrs={'cols': 30, 'rows': 4}),
+            'tags': TextInput(),
+        }
+        
+    def clean_tags(self):
+        tag_list = []
+        tags = self.cleaned_data["tags"].split(",")
+        for tag_str in tags:
+            tag, created = Tag.objects.get_or_create(name=tag_str) #@UnusedVariable
+            tag_list.append(tag.pk)
+        
+        return tag_list
+
+class CreateIdeaView(CreateLinkView):
+    model = Post
+    form_class = IdeaCreationForm
+    template_name = 'posts/idea_form.html'
+    
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(CreateIdeaView, self).dispatch(*args, **kwargs)
+
 class EventCreationForm(LinkCreationForm):
     location = forms.CharField(max_length=100)
     room = forms.CharField(max_length=100, required=False, label='Room/Floor (specify)')

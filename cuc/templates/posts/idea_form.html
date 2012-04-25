@@ -20,7 +20,7 @@ $(document).ready(function(){
 </script>
 {% endblock %}
 
-{% block title %}Post Link{% endblock %}
+{% block title %}Post Idea{% endblock %}
 
 {% block options %}
 <div class="post-types">
@@ -31,10 +31,10 @@ $(document).ready(function(){
 {% endblock %}
 
 {% block form %}
-<div class="post-title"><h1>Post Link</h1></div>
+<div class="post-title"><h1>Post Idea</h1></div>
 
 <form action="" method="post" enctype="multipart/form-data">
 	{% csrf_token %} {{ form.as_p }} 
-	<input type="submit" value="Post Link!" />
+	<input type="submit" value="Post Idea!" />
 </form>
 {% endblock %}
