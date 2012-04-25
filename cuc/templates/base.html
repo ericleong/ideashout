@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>{% block title %}Untitled{% endblock %}</title>
+<title>{% block title %}IdeaShout{% endblock %}</title>
 
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/reset.css" />
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/style.css" />
@@ -16,7 +16,7 @@
 <body>
 	<div class="page">
 		<div class="header">
-			<div id="logo"><a href="/">Club Connect</a></div>			
+			<div id="logo"><a href="/">Idea Shout</a></div>			
 			<div id="navigation">
 				{% if user.is_authenticated %}
 				<a class="stationary" href="{% url directory %}">Directory</a>
