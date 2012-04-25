@@ -186,7 +186,7 @@ class IdeaCreationForm(forms.ModelForm):
         tag_list = []
         tags = self.cleaned_data["tags"].split(",")
         for tag_str in tags:
-            tag, created = Tag.objects.get_or_create(name=tag_str) #@UnusedVariable
+            tag, created = Tag.objects.get_or_create(name=tag_str.lower()) #@UnusedVariable
             tag_list.append(tag.pk)
         
         return tag_list
