@@ -8,6 +8,7 @@ from posts.models import Post
 from posts.views import latestPostsFeed, PostView, generate_calendar, UserView, \
     CreateLinkView, CreateEventView, TagView, SignupForm, EditUserView, \
     CreateIdeaView
+import datetime
 import django.contrib.auth.views
 import settings
 
@@ -27,7 +28,7 @@ urlpatterns = patterns('',
     
     # Posts
     url(r'^$', ListView.as_view(model=Post, queryset=Post.objects.order_by("-created"), context_object_name="posts",), name="home"),
-    url(r'^events$', ListView.as_view(model=Post, queryset=Post.objects.filter(start_time__isnull=False).order_by("start_time"), 
+    url(r'^events$', ListView.as_view(model=Post, queryset=Post.objects.filter(start_time__isnull=False, start_time__gte=datetime.datetime.now()).order_by("start_time"), 
                                 template_name="posts/event_list.html", context_object_name="posts",), name="events"),
     url(r'^links$', ListView.as_view(model=Post, queryset=Post.objects.filter(start_time__isnull=True, link__isnull=False).order_by("-created"), 
                                 template_name="posts/link_list.html", context_object_name="posts",), name="links"),
