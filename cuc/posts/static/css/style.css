@@ -54,7 +54,8 @@ a.stationary:hover {
 }
 
 .page {
-    width: 1024px;
+    min-width: 800px;
+    max-width: 1024px;
     margin-left: auto;
     margin-right: auto;
     position: relative;
