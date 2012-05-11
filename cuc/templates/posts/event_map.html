@@ -15,7 +15,7 @@ var posts = [
 				{% if post.location %}
 				"location" : {
 					"name" : "{{ post.location.name|escapejs }}",
-					{% if post.location.room %}"room" : {{ post.location.room }}, {% endif %}
+					{% if post.location.room %}"room" : "{{ post.location.room|escapejs }}", {% endif %}
 					"address" : "{{ post.location.address|escapejs }}",
 					{% if post.location.latitude %}"latitude" : {{ post.location.latitude }},{% endif %}
 					{% if post.location.longitude %}"longitude" : {{ post.location.longitude }},{% endif %}
