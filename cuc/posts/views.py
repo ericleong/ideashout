@@ -11,6 +11,7 @@ from django.forms.widgets import Textarea, TextInput
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
+from django.views.generic.dates import DayArchiveView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
@@ -24,6 +25,33 @@ class TagView(ListView):
     
     def get_queryset(self):
         return Post.objects.order_by("-created").filter(tags__name=self.kwargs['tag'])
+    
+class DayView(DayArchiveView):
+    model = Post
+    template_name = "posts/event_list.html"
+    context_object_name = "posts"
+    month_format = "%m"
+    allow_future = True
+    date_field = "start_time"
+    
+    def get_queryset(self):
+        return Post.objects.filter(start_time__isnull=False, start_time__year=self.kwargs['year'], start_time__month=self.kwargs['month'], start_time__day=self.kwargs['day']).order_by("start_time")
+
+class MonthView(ListView):
+    model = Post
+    template_name = "posts/event_map.html"
+    context_object_name = "posts"
+    
+    def get_queryset(self):
+        return Post.objects.filter(start_time__isnull=False, start_time__year=self.kwargs['year'], start_time__month=self.kwargs['month']).order_by("start_time")
+
+class YearView(ListView):
+    model = Post
+    template_name = "posts/event_list.html"
+    context_object_name = "posts"
+    
+    def get_queryset(self):
+        return Post.objects.filter(start_time__isnull=False, start_time__year=self.kwargs['year']).order_by("start_time")
 
 
 class UserView(DetailView):

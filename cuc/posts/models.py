@@ -19,6 +19,9 @@ class Post(models.Model):
     slug = models.SlugField(blank=True)
     committed = models.ManyToManyField(User, related_name='events', blank=True, null=True)
     
+    def date(self):
+        return self.start_time
+    
     def __unicode__(self):
         return u'"%s" by %s on %s' % (self.title, self.author, self.created)
     

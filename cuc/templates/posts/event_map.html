@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load gencal %}
+
+{% block title %}Event Map{% endblock %}
+
+{% block content %}
+
+<div class="post-title">
+	<h1>Event Map</h1>
+	<div class="event-calendar">
+		{% gencal posts %}
+	</div>
+</div>
+
+{% endblock %}

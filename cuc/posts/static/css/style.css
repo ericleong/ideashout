@@ -412,6 +412,41 @@ input[type=submit]:hover {
 	color: #C20B39;
 }
 
+/* calendar */
+table {
+    border-collapse: collapse;
+    width: 50%;
+}
+
+th, td {
+    width: 72px;
+}
+
+th {
+    height: 48px;
+    text-align: left;
+    color: #7B86E2;
+}
+
+th.month {
+    text-align: center;
+    color: #C20B39;
+}
+
+td {
+    text-align: left;
+    vertical-align: top;
+    height: 64px;
+}
+
+tr {
+	color: #13A0D8;
+}
+
+tr a {
+	color: #C20B39;
+}
+
 /* css for timepicker */
 .ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
 .ui-timepicker-div dl { text-align: left; }

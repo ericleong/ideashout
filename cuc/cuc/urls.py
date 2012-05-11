@@ -1,13 +1,14 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.contrib.auth.models import User
+from django.utils.timezone import now
 from django.views.generic.base import RedirectView
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from posts.models import Post
 from posts.views import latestPostsFeed, PostView, generate_calendar, UserView, \
     CreateLinkView, CreateEventView, TagView, SignupForm, EditUserView, \
-    CreateIdeaView
+    CreateIdeaView, MonthView, DayView, YearView
 import datetime
 import django.contrib.auth.views
 import settings
@@ -28,8 +29,13 @@ urlpatterns = patterns('',
     
     # Posts
     url(r'^$', ListView.as_view(model=Post, queryset=Post.objects.order_by("-created"), context_object_name="posts",), name="home"),
-    url(r'^events$', ListView.as_view(model=Post, queryset=Post.objects.filter(start_time__isnull=False, start_time__gte=datetime.datetime.now()).order_by("start_time"), 
+    url(r'^events$', ListView.as_view(model=Post, queryset=Post.objects.filter(start_time__isnull=False, start_time__gte=now()).order_by("start_time"), 
                                 template_name="posts/event_list.html", context_object_name="posts",), name="events"),
+    url(r'^events/map$', ListView.as_view(model=Post, queryset=Post.objects.filter(start_time__isnull=False, start_time__gte=now()).order_by("start_time"), 
+                                template_name="posts/event_map.html", context_object_name="posts",), name="events-map"),
+    url(r'^events/(?P<year>\d{4})/$', YearView.as_view(), name="events-year"),
+    url(r'^events/(?P<year>\d{4})/(?P<month>\d{1,2}?)/$', MonthView.as_view(), name="events-month"),
+    url(r'^events/(?P<year>\d{4})/(?P<month>\d{1,2}?)/(?P<day>\d{1,2}?)/$', DayView.as_view(), name="events-day"),
     url(r'^links$', ListView.as_view(model=Post, queryset=Post.objects.filter(start_time__isnull=True, link__isnull=False).order_by("-created"), 
                                 template_name="posts/link_list.html", context_object_name="posts",), name="links"),
     url(r'^ideas$', ListView.as_view(model=Post, queryset=Post.objects.filter(start_time__isnull=True, link__exact="").order_by("-responses__created"), 
