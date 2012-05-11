@@ -413,9 +413,19 @@ input[type=submit]:hover {
 }
 
 /* calendar */
+.twocol {
+	position: relative;
+}
+
+.event-calendar {
+	width: 50%;
+	font-size: 20pt;
+	color: #C20B39;
+}
+
 table {
     border-collapse: collapse;
-    width: 50%;
+    width: 100%;
 }
 
 th, td {
@@ -437,14 +447,37 @@ td {
     text-align: left;
     vertical-align: top;
     height: 64px;
+    
+    color: #13A0D8;
 }
 
-tr {
-	color: #13A0D8;
-}
-
-tr a {
+td a {
 	color: #C20B39;
+}
+
+td.today {
+	color: white;
+	background-color: #7B86E2;
+}
+
+td.today a {
+	color: white;
+}
+
+td:hover, td.highlight {
+	color: white;
+	background-color: #E1426A;
+}
+
+td:hover a, td.highlight a {
+	color: white;
+}
+
+/* map */
+#event-map {
+	width: 50%;
+	height: 416px;
+	float: right;
 }
 
 /* css for timepicker */

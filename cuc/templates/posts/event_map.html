@@ -3,10 +3,41 @@
 
 {% block title %}Event Map{% endblock %}
 
+{% block script %}
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/event-map.js"></script>
+
+<script type="text/javascript">
+
+var posts = [
+             {% for post in posts %}
+			{
+				"date" : "{{ post.start_time.date|escapejs }}",
+				{% if post.location %}
+				"location" : {
+					"name" : "{{ post.location.name|escapejs }}",
+					{% if post.location.room %}"room" : {{ post.location.room }}, {% endif %}
+					"address" : "{{ post.location.address|escapejs }}",
+					"latitude" : {{ post.location.latitude }},
+					"longitude" : {{ post.location.longitude }},
+				},
+				{% endif %}
+				"start_time" : "{{ post.start_time|date:"f A l F j"|escapejs }}",
+				"end_time" : "{{ post.end_time|date:"f A l F j"|escapejs }}",
+				"permalink" : "{{ post.get_absolute_url|escapejs }}",
+			}
+{% endfor %}];
+</script>
+{% endblock %}
+
 {% block content %}
 
 <div class="post-title">
 	<h1>Event Map</h1>
+</div>
+<div class="twocol">
+	<div id="event-map">
+	</div>
 	<div class="event-calendar">
 		{% gencal posts %}
 	</div>

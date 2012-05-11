@@ -121,10 +121,16 @@ class ListCalendar(HTMLCalendar):
         :type weekday: int.
         """
         link = self.get_link(day)
+        today_str = ""
+        
+        if day == datetime.datetime.now().date():
+            today_str = 'class="today"'
+            
         if link:
             # return link
-            return '<td><a href="%s">%d</a></td>' % (link,  day.day)
-        return '<td>%d</td>' % (day.day)
+            return '<td %s id="%s"><a href="%s">%d</a></td>' % (today_str, day, link,  day.day)
+        
+        return '<td %s >%d</td>' % (today_str, day.day)
 
     def get_link(self, dt):
         """
