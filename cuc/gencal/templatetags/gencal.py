@@ -91,7 +91,7 @@ class ListCalendar(HTMLCalendar):
 
         self.date_field = kwargs.pop('date_field', 'start_time')
 
-        super(ListCalendar, self).__init__(*args, **kwargs)
+        super(ListCalendar, self).__init__(firstweekday=6, *args, **kwargs)
 
         cal_arr = self.monthdatescalendar(year, month)
         month_dict = SortedDict()
