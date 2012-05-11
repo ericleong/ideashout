@@ -17,8 +17,8 @@ var posts = [
 					"name" : "{{ post.location.name|escapejs }}",
 					{% if post.location.room %}"room" : {{ post.location.room }}, {% endif %}
 					"address" : "{{ post.location.address|escapejs }}",
-					"latitude" : {{ post.location.latitude }},
-					"longitude" : {{ post.location.longitude }},
+					{% if post.location.latitude %}"latitude" : {{ post.location.latitude }},{% endif %}
+					{% if post.location.longitude %}"longitude" : {{ post.location.longitude }},{% endif %}
 				},
 				{% endif %}
 				"start_time" : "{{ post.start_time|date:"f A l F j"|escapejs }}",
