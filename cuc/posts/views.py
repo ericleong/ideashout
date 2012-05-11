@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.syndication.views import Feed
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from django.forms.widgets import Textarea, TextInput
+from django.forms.widgets import Textarea, TextInput, HiddenInput
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
@@ -233,10 +233,12 @@ class EventCreationForm(LinkCreationForm):
     room = forms.CharField(max_length=100, required=False, label='Room/Floor (specify)')
     address = forms.CharField(max_length=200)
     link = forms.URLField(required=False)
+    latitude = forms.FloatField(widget=forms.HiddenInput)
+    longitude = forms.FloatField(widget=forms.HiddenInput)
     
     class Meta:
         model = Post
-        fields = ('title', 'description', 'link', 'location', 'room', 'address', 'start_time', 'end_time', 'tags', 'private')
+        fields = ('title', 'description', 'link', 'location', 'room', 'address', 'latitude', 'longitude', 'start_time', 'end_time', 'tags', 'private')
         widgets = {
             'description': Textarea(attrs={'cols': 30, 'rows': 4}),
         }
@@ -245,10 +247,15 @@ class EventCreationForm(LinkCreationForm):
         loc_str = self.cleaned_data["location"]
         room_str = self.data["room"]
         address_str = self.data["address"]
+        latitude_str = self.data["latitude"]
+        longitude_str = self.data["longitude"]
         
         location, created = Location.objects.get_or_create(name=loc_str, #@UnusedVariable
                                                            room=room_str, 
                                                            address=address_str)
+        location.latitude = latitude_str;
+        location.longitude = longitude_str;
+        location.save()
         
         return location
         

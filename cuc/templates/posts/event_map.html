@@ -24,7 +24,7 @@ var posts = [
 				"start_time" : "{{ post.start_time|date:"f A l F j"|escapejs }}",
 				"end_time" : "{{ post.end_time|date:"f A l F j"|escapejs }}",
 				"permalink" : "{{ post.get_absolute_url|escapejs }}",
-			}
+			},
 {% endfor %}];
 </script>
 {% endblock %}

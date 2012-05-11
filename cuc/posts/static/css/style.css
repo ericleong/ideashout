@@ -49,6 +49,18 @@ a.stationary:hover {
 	color: #7B86E2;
 }
 
+a.pop:link {
+	color: #C20B39;
+}
+
+a.pop:visited {
+	color: #C20B39;
+}
+
+a.pop:hover {
+	color: #7B86E2;
+}
+
 #logo a:visited {
 	color: #C20B39;
 }
@@ -100,6 +112,14 @@ a.stationary:hover {
 .post-feeds {
 	position: absolute;
 	right: 0px;
+}
+
+.post-alts {
+	position: absolute;
+	right: 0px;
+	
+	font-family: 'Sansita One';
+	font-size: 20pt;
 }
 
 .post {

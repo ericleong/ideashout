@@ -76,6 +76,11 @@ $(function() {
 		shadow: markerImage_shadow,
 	});
 	
+	google.maps.event.addListener(marker, 'position_changed', function() {
+		$('#id_latitude').val(marker.getPosition().lat());
+		$('#id_longitude').val(marker.getPosition().lng());
+	});
+	
 	$('#id_location').keyup(checkAddress);
 	$('#id_address').keyup(checkAddress);
 });
