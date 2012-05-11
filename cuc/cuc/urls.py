@@ -9,7 +9,6 @@ from posts.models import Post
 from posts.views import latestPostsFeed, PostView, generate_calendar, UserView, \
     CreateLinkView, CreateEventView, TagView, SignupForm, EditUserView, \
     CreateIdeaView, MonthView, DayView, YearView
-import datetime
 import django.contrib.auth.views
 import settings
 

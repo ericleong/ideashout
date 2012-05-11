@@ -1,9 +1,8 @@
-from calendar import HTMLCalendar, Calendar
+from calendar import HTMLCalendar
 from django import template
 from django.core.urlresolvers import reverse
 from django.utils.datastructures import SortedDict
 from posts.models import Post
-import calendar
 import datetime
 import django.utils.timezone
 
