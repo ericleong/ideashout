@@ -81,10 +81,6 @@ function populate(posts) {
 }
 
 $(function() {
-	$(window).resize(function() {
-		google.maps.event.trigger(map, 'resize');
-	});
-
 	initialize();
 	populate(posts);
 });

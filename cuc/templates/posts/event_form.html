@@ -12,6 +12,9 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/tag-it.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-timepicker-addon.js"></script>
 
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/event-form.js"></script>
+
 <script type="text/javascript">
 $(function(){
 	$('#id_start_time').datetimepicker();
@@ -38,6 +41,7 @@ $(function(){
 			$( "#id_location" ).val( ui.item.value );
 			$( "#id_room" ).val( ui.item.room );
 			$( "#id_address" ).val( ui.item.address );
+			findAddress();
 			return false;
 		}
 	}).data( "autocomplete" )._renderItem = function( ul, item ) {
@@ -72,8 +76,11 @@ $(document).ready(function(){
 {% block form %}
 <div class="post-title"><h1>Post Event</h1></div>
 
-<form action="" method="post" enctype="multipart/form-data">
-	{% csrf_token %} {{ form.as_p }}
-	<input type="submit" value="Post Event!" />
-</form>
+<div id="event-form-map"></div>
+<div class="post-form">
+	<form action="" method="post" enctype="multipart/form-data">
+		{% csrf_token %} {{ form.as_p }}
+		<input type="submit" value="Post Event!" />
+	</form>
+</div>
 {% endblock %}

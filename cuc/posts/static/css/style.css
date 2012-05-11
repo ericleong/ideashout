@@ -423,27 +423,27 @@ input[type=submit]:hover {
 	color: #C20B39;
 }
 
-table {
+.event-calendar table {
     border-collapse: collapse;
     width: 100%;
 }
 
-th, td {
+.event-calendar th, .event-calendar td {
     width: 72px;
 }
 
-th {
+.event-calendar th {
     height: 48px;
     text-align: left;
     color: #7B86E2;
 }
 
-th.month {
+.event-calendar th.month {
     text-align: center;
     color: #C20B39;
 }
 
-td {
+.event-calendar td {
     text-align: left;
     vertical-align: top;
     height: 64px;
@@ -451,25 +451,25 @@ td {
     color: #13A0D8;
 }
 
-td a {
+.event-calendar td a {
 	color: #C20B39;
 }
 
-td.today {
+.event-calendar td.today {
 	color: white;
 	background-color: #7B86E2;
 }
 
-td.today a {
+.event-calendar td.today a {
 	color: white;
 }
 
-td:hover, td.highlight {
+.event-calendar td:hover, .event-calendar td.highlight {
 	color: white;
 	background-color: #E1426A;
 }
 
-td:hover a, td.highlight a {
+.event-calendar td:hover a, td.highlight a {
 	color: white;
 }
 
@@ -477,6 +477,19 @@ td:hover a, td.highlight a {
 #event-map {
 	width: 50%;
 	height: 416px;
+	float: right;
+}
+
+#event-form-map {
+	display: none;
+	
+	margin-top: 200px;
+	
+	margin-left: auto;
+	margin-right: auto;
+	
+	width: 480px;
+	height: 400px;
 	float: right;
 }
 
