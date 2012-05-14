@@ -8,7 +8,7 @@ from django.views.generic.list import ListView
 from posts.models import Post
 from posts.views import latestPostsFeed, PostView, generate_calendar, UserView, \
     CreateLinkView, CreateEventView, TagView, SignupForm, EditUserView, \
-    CreateIdeaView, MonthView, DayView, YearView
+    CreateIdeaView, MonthView, DayView, YearView, MapView
 import django.contrib.auth.views
 import settings
 
@@ -30,8 +30,7 @@ urlpatterns = patterns('',
     url(r'^$', ListView.as_view(model=Post, queryset=Post.objects.order_by("-created"), context_object_name="posts",), name="home"),
     url(r'^events$', ListView.as_view(model=Post, queryset=Post.objects.filter(start_time__isnull=False, start_time__gte=now()).order_by("start_time"), 
                                 template_name="posts/event_list.html", context_object_name="posts",), name="events"),
-    url(r'^events/map$', ListView.as_view(model=Post, queryset=Post.objects.filter(start_time__isnull=False, start_time__gte=now(), start_time__month=now().date().month).order_by("start_time"), 
-                                template_name="posts/event_map.html", context_object_name="posts",), name="events-map"),
+    url(r'^events/map$', MapView.as_view(), name="events-map"),
     url(r'^events/(?P<year>\d{4})/$', YearView.as_view(), name="events-year"),
     url(r'^events/(?P<year>\d{4})/(?P<month>\d{1,2}?)/$', MonthView.as_view(), name="events-month"),
     url(r'^events/(?P<year>\d{4})/(?P<month>\d{1,2}?)/(?P<day>\d{1,2}?)/$', DayView.as_view(), name="events-day"),

@@ -7,10 +7,11 @@ from django.contrib.auth.models import User
 from django.contrib.syndication.views import Feed
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from django.forms.widgets import Textarea, TextInput, HiddenInput
+from django.forms.widgets import Textarea, TextInput
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
+from django.utils.timezone import now
 from django.views.generic.dates import DayArchiveView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView
@@ -25,6 +26,21 @@ class TagView(ListView):
     
     def get_queryset(self):
         return Post.objects.order_by("-created").filter(tags__name=self.kwargs['tag'])
+    
+class MapView(ListView):
+    model=Post
+    template_name="posts/event_map.html"
+    context_object_name="posts"
+    
+    def get_queryset(self):
+        return Post.objects.filter(start_time__isnull=False, start_time__month=now().date().month).order_by("start_time")
+    
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(MapView, self).get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        context['locations'] = Location.objects.filter(events__start_time__isnull=False, events__start_time__month=now().date().month).distinct()
+        return context
     
 class DayView(DayArchiveView):
     model = Post

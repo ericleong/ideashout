@@ -12,7 +12,7 @@ class Post(models.Model):
     link = models.URLField(blank=True)
     author = models.ForeignKey(User, related_name='posts')
     tags = models.ManyToManyField('Tag', blank=True)
-    location = models.ForeignKey('Location', blank=True, null=True)
+    location = models.ForeignKey('Location', related_name='events', blank=True, null=True)
     start_time = models.DateTimeField(blank=True, null=True)
     end_time = models.DateTimeField(blank=True, null=True)
     private = models.BooleanField(default=False)

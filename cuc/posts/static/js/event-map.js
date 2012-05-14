@@ -28,13 +28,15 @@ function initialize() {
 	map = new google.maps.Map(document.getElementById("event-map"), myOptions);	
 }
 
-function populate(posts) {
+function populate(locations) {
 	 var bounds = new google.maps.LatLngBounds();
 	
-	$.each(posts, function(i, post) {
+	$.each(locations, function(i, location) {
+		var post = posts[location[0]];
+		
 		var loc = new google.maps.LatLng(post.location.latitude, post.location.longitude);
 		
-		post.marker = new google.maps.Marker({
+		var marker = new google.maps.Marker({
 			position: loc,
 			icon: markerImage_post,
 			shadow: markerImage_shadow,
@@ -45,33 +47,37 @@ function populate(posts) {
 		bounds.extend(loc);
 		
 		// tie map events to the calendar
-		google.maps.event.addListener(post.marker, 'mouseover', function() {
-			$("#" + post.date).addClass('highlight');
-			post.marker.setIcon(markerImage_post_highlight);
+		google.maps.event.addListener(marker, 'mouseover', function() {
+			$.each(location, function(j, event){
+				$("#" + posts[event].id).addClass('highlight');
+				console.log(posts[event].id);
+			});
+			marker.setIcon(markerImage_post_highlight);
 		});
 		
-		google.maps.event.addListener(post.marker, 'click', function() {
-			$("#" + post.date).addClass('highlight');
-		});
-		
-		google.maps.event.addListener(post.marker, 'mouseout', function() {
-			$("#" + post.date).removeClass('highlight');
-			post.marker.setIcon(markerImage_post);
+		google.maps.event.addListener(marker, 'mouseout', function() {
+			$.each(location, function(j, event){
+				$("#" + posts[event].id).removeClass('highlight');
+			});
+			marker.setIcon(markerImage_post);
 		});
 		
 		// tie calendar events to the map
-		$("#" + post.date).on('click', function() {
-			google.maps.event.trigger(post.marker,'click');
+		/*$("#" + post.id).on('click', function() {
+			google.maps.event.trigger(marker, 'click');
+		});*/
+		
+		$.each(location, function(j, event){
+			$("#" + posts[event].id).hover(
+				function () {
+					marker.setIcon(markerImage_post_highlight);
+				},
+				function () {
+					marker.setIcon(markerImage_post);
+				}
+			);
 		});
 		
-		$("#" + post.date).hover(
-			function () {
-				google.maps.event.trigger(post.marker, 'mouseover');
-			},
-			function () {
-				google.maps.event.trigger(post.marker, 'mouseout');
-			}
-		);
     });
 	
 	if (bounds.isEmpty() || bounds.toSpan().lat() < 0.02 || bounds.toSpan().lng() < 0.02) {
@@ -82,5 +88,5 @@ function populate(posts) {
 
 $(function() {
 	initialize();
-	populate(posts);
+	populate(locations);
 });

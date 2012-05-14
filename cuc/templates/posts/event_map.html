@@ -8,10 +8,12 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/event-map.js"></script>
 
 <script type="text/javascript">
-var posts = [
+var posts = {
              {% for post in posts %}
+            "{{ post.id }}":
 			{
-				"date" : "{{ post.start_time.date|escapejs }}",
+            	"id" : "{{ post.start_time.date|escapejs }}",
+				"date" : "{{ post.start_time.date|date:"DATE_FORMAT"|escapejs }}",
 				{% if post.location %}
 				"location" : {
 					"name" : "{{ post.location.name|escapejs }}",
@@ -25,7 +27,13 @@ var posts = [
 				"end_time" : "{{ post.end_time|date:"f A l F j"|escapejs }}",
 				"permalink" : "{{ post.get_absolute_url|escapejs }}",
 			},
-{% endfor %}];
+{% endfor %}};
+
+var locations = [
+             	{% for location in locations %}
+             	[{% for post in location.events.all %}{{ post.id}},{% endfor %}],
+             	{% endfor %}
+             	];
 </script>
 {% endblock %}
 
