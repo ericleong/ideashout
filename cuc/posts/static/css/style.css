@@ -484,12 +484,12 @@ input[type=submit]:hover {
 	color: white;
 }
 
-.event-calendar td:hover, .event-calendar td.highlight {
+.event-calendar td.highlight, .event-calendar td.select {
 	color: white;
 	background-color: #E1426A;
 }
 
-.event-calendar td:hover a, td.highlight a {
+.event-calendar td.highlight a, .event-calendar td.select a {
 	color: white;
 }
 

@@ -44,15 +44,35 @@ function populate(locations) {
 			title: post.location.name,
 		});
 		
+		var select = false;
+		
 		bounds.extend(loc);
+		
+		$.each(location, function(j, event){
+			if (posts[event].markers == undefined) {
+				posts[event].markers = [];
+			}
+			posts[event].markers.push(marker);
+		});
 		
 		// tie map events to the calendar
 		google.maps.event.addListener(marker, 'mouseover', function() {
 			$.each(location, function(j, event){
 				$("#" + posts[event].id).addClass('highlight');
-				console.log(posts[event].id);
 			});
 			marker.setIcon(markerImage_post_highlight);
+		});
+		
+		google.maps.event.addListener(marker, 'click', function() {
+			$.each(location, function(j, event){
+				$("#" + posts[event].id).toggleClass('select');
+			});
+			if (select) {
+				marker.setIcon(markerImage_post);
+			} else {
+				marker.setIcon(markerImage_post_highlight);
+			}
+			select = !select;
 		});
 		
 		google.maps.event.addListener(marker, 'dblclick', function() {
@@ -63,21 +83,36 @@ function populate(locations) {
 			$.each(location, function(j, event){
 				$("#" + posts[event].id).removeClass('highlight');
 			});
-			marker.setIcon(markerImage_post);
+			if (!select) {
+				marker.setIcon(markerImage_post);
+			}
 		});
-		
-		// tie calendar events to the map
-		/*$("#" + post.id).on('click', function() {
-			google.maps.event.trigger(marker, 'click');
-		});*/
 		
 		$.each(location, function(j, event){
 			$("#" + posts[event].id).hover(
 				function () {
 					marker.setIcon(markerImage_post_highlight);
+					$(this).addClass('highlight');
 				},
 				function () {
-					marker.setIcon(markerImage_post);
+					if (!select) {
+						marker.setIcon(markerImage_post);
+					}
+					$(this).removeClass('highlight');
+				}
+			);
+			
+			$("#" + posts[event].id).click(
+				function () {
+					if (select) {
+						marker.setIcon(markerImage_post);
+						$(this).removeClass('select');
+					} else {
+						marker.setIcon(markerImage_post_highlight);
+						$(this).addClass('select');
+					}
+					
+					select = !select;
 				}
 			);
 		});
