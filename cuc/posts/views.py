@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.forms.widgets import Textarea, TextInput
 from django.http import HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.timezone import now
 from django.views.generic.dates import DayArchiveView
@@ -22,10 +22,21 @@ from posts.models import Post, Response, Tag, Location
 
 class TagView(ListView):
     # TODO: a slightly different page with the tag name?
-    template_name = "posts/post_list.html"
+    model=Post
+    context_object_name="posts"
+    template_name ="posts/post_list.html"
     
     def get_queryset(self):
         return Post.objects.order_by("-created").filter(tags__name=self.kwargs['tag'])
+
+class LocationView(ListView):
+    model=Post
+    context_object_name="posts"
+    template_name ="posts/event_list.html"
+    
+    def get_queryset(self):
+        location = get_object_or_404(Location, slug=self.kwargs['slug'])
+        return Post.objects.filter(location=location).order_by("start_time")
     
 class MapView(ListView):
     model=Post

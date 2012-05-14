@@ -55,6 +55,10 @@ function populate(locations) {
 			marker.setIcon(markerImage_post_highlight);
 		});
 		
+		google.maps.event.addListener(marker, 'dblclick', function() {
+			window.location = post.location.permalink;
+		});
+		
 		google.maps.event.addListener(marker, 'mouseout', function() {
 			$.each(location, function(j, event){
 				$("#" + posts[event].id).removeClass('highlight');

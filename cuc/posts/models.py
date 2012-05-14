@@ -39,9 +39,17 @@ class Location(models.Model):
     # TODO: not using these for now
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
+    slug = models.SlugField()
     
     def __unicode__(self):
         return u'"%s" (%s) at %s' % (self.name, self.room, self.address)
+    
+    def get_absolute_url(self):
+        return "/location/%s/" % slugify(self.name)
+    
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)[:50]
+        super(Location, self).save(*args, **kwargs)
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User)
