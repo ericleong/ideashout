@@ -239,5 +239,8 @@ function updateSelected() {
 
 $(function() {
 	initialize();
+	
 	populate(locations);
+	
+	google.maps.event.trigger(map, "resize");
 });

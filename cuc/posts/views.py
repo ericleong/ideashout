@@ -32,11 +32,18 @@ class TagView(ListView):
 class LocationView(ListView):
     model=Post
     context_object_name="posts"
-    template_name ="posts/event_list.html"
+    template_name ="posts/location_list.html"
     
     def get_queryset(self):
         location = get_object_or_404(Location, slug=self.kwargs['slug'])
         return Post.objects.filter(location=location).order_by("start_time")
+    
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(LocationView, self).get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        context['location'] = get_object_or_404(Location, slug=self.kwargs['slug']) 
+        return context
     
 class MapView(ListView):
     model=Post

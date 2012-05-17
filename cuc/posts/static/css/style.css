@@ -25,6 +25,10 @@ h1 {
 	color: #13A0D8;
 }
 
+.righty {
+	text-align: right;
+}
+
 /* specifics */
 
 .errorlist {
@@ -437,6 +441,14 @@ input[type=submit]:hover {
 	position: relative;
 }
 
+.twocol .col {
+	width: 50%;
+}
+
+.twocol .right {
+	float: right;
+}
+
 .event-calendar {
 	width: 50%;
 	font-size: 20pt;
@@ -502,6 +514,10 @@ input[type=submit]:hover {
 	width: 50%;
 	height: 416px;
 	float: right;
+}
+
+#event-map-single {
+	height: 180px;
 }
 
 #event-form-map {
