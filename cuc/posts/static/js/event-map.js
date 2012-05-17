@@ -29,7 +29,10 @@ function initialize() {
 }
 
 function populate(locations) {
-	 var bounds = new google.maps.LatLngBounds();
+	var bounds = new google.maps.LatLngBounds();
+	
+	// the posts that are currently selected
+	var selected = [];
 	
 	$.each(locations, function(i, location) {
 		var post = posts[location[0]];
@@ -44,15 +47,13 @@ function populate(locations) {
 			title: post.location.name,
 		});
 		
-		var select = false;
+		// TODO: value of select is not altered when other markers alter it!
+		marker.select = false;
 		
 		bounds.extend(loc);
 		
 		$.each(location, function(j, event){
-			if (posts[event].markers == undefined) {
-				posts[event].markers = [];
-			}
-			posts[event].markers.push(marker);
+			posts[event].marker = marker;
 		});
 		
 		// tie map events to the calendar
@@ -63,16 +64,33 @@ function populate(locations) {
 			marker.setIcon(markerImage_post_highlight);
 		});
 		
-		google.maps.event.addListener(marker, 'click', function() {
-			$.each(location, function(j, event){
-				$("#" + posts[event].id).toggleClass('select');
-			});
-			if (select) {
+		google.maps.event.addListener(marker, 'click', function() {			
+			marker.select = !marker.select;
+			
+			if (!marker.select) { // not selected
+				selected = [];
+				
+				$.each(location, function(j, event){
+					$("#" + posts[event].id).removeClass('select');
+				});
 				marker.setIcon(markerImage_post);
-			} else {
+			} else { // selected
+				
+				// deselect previous selection
+				$.each(selected, function(j, event){
+					$("#" + posts[event].id).removeClass('select');
+					posts[event].marker.setIcon(markerImage_post);
+					posts[event].marker.select = false;
+				});
+				selected = location;
+				
+				// select current location
+				$.each(location, function(j, event){
+					$("#" + posts[event].id).addClass('select');
+				});
 				marker.setIcon(markerImage_post_highlight);
 			}
-			select = !select;
+			
 		});
 		
 		google.maps.event.addListener(marker, 'dblclick', function() {
@@ -83,36 +101,109 @@ function populate(locations) {
 			$.each(location, function(j, event){
 				$("#" + posts[event].id).removeClass('highlight');
 			});
-			if (!select) {
+			if (!marker.select) {
 				marker.setIcon(markerImage_post);
 			}
 		});
 		
+		/* This is a little complicated, so here's an explanation: 
+		 * Basically, we will iterate through every event in this particular location.
+		 * The end result is that every event will be iterated through once (if it has a location!).
+		 * 
+		 * This means that there needs to be some trickery, because one date may map to more than one
+		 * location, and vice versa.
+		 */
 		$.each(location, function(j, event){
+			
+			/* Hover: this is simple */
 			$("#" + posts[event].id).hover(
 				function () {
 					marker.setIcon(markerImage_post_highlight);
 					$(this).addClass('highlight');
 				},
 				function () {
-					if (!select) {
+					// don't reset the icon unless we're allowed to
+					if (!marker.select) {
 						marker.setIcon(markerImage_post);
 					}
 					$(this).removeClass('highlight');
 				}
 			);
 			
-			$("#" + posts[event].id).click(
+			// Click: this is complicated
+			$("#" + posts[event].id).click(				
 				function () {
-					if (select) {
+					
+					function isDeselectable(selected) {
+						/**
+						 * This function tells us whether or not any of the currently selected dates
+						 * corresponds to the date the user just clicked on.
+						 * The user obviously didn't deselect if they clicked on a date that only has
+						 * different events.
+						 */
+						var deselect = false;
+						
+						$.each(selected, function(j, e){
+							if (e == event) {
+								deselect = true;
+							}
+						});
+						
+						return deselect;
+					}
+
+					if (isDeselectable(selected)) { // deselect
+						/* If the user did deselect, do the usual.
+						 * Remember that every event for this date will be deselected since
+						 * we have multiple click events bound to the same date.
+						 */
+						
 						marker.setIcon(markerImage_post);
+						marker.select = false;
 						$(this).removeClass('select');
-					} else {
-						marker.setIcon(markerImage_post_highlight);
+						selected.splice(selected.indexOf(event), 1);
+						
+					} else { // select
+						/*
+						 * The user has selected us!
+						 */
+						// create a separate list to mark down the previous selection
+						var remove_selected = selected.slice(0);
+						
+						// deselect previous selection
+						$.each(selected, function(j, e){
+							// If a previously selected element doesn't have the date of the 
+							// currently selected element, remove it (no longer selected)
+							if (posts[e].id != posts[event].id) {
+								$("#" + posts[e].id).removeClass('select');
+								posts[e].marker.setIcon(markerImage_post);
+								posts[e].marker.select = false;
+								
+								remove_selected.push(e);
+							}
+						});
+						
+						// Remove the events marked for selection
+						$.each(remove_selected, function(j, e) {
+							selected.splice(selected.indexOf(e), 1);
+						});
+						
+						// Make the current location selected.
+						// Other events during this date will activate when the click is propogated.
+						marker.setIcon(markerImage_post_highlight);			
+						marker.select = true;
+						
+						// Make the current date selected.
 						$(this).addClass('select');
+						
+						// Only add this event if it hasn't already been added.
+						if (selected.indexOf(event) < 0) {
+							selected.push(event);
+						}
 					}
 					
-					select = !select;
+					/* Note that we can't return false, we need the click to propogate to other events
+					 * for this date */
 				}
 			);
 		});
