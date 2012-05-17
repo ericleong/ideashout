@@ -9,6 +9,9 @@ var markerImage_shadow = new google.maps.MarkerImage("/static/images/shadow.png"
 		new google.maps.Size(45, 40)
 		);
 
+//the posts that are currently selected
+var selected = [];
+
 function initialize() {
 	// generates map
 	
@@ -30,9 +33,6 @@ function initialize() {
 
 function populate(locations) {
 	var bounds = new google.maps.LatLngBounds();
-	
-	// the posts that are currently selected
-	var selected = [];
 	
 	$.each(locations, function(i, location) {
 		var post = posts[location[0]];
@@ -60,6 +60,7 @@ function populate(locations) {
 		google.maps.event.addListener(marker, 'mouseover', function() {
 			$.each(location, function(j, event){
 				$("#" + posts[event].id).addClass('highlight');
+				$('#postid-' + event).addClass('highlight');
 			});
 			marker.setIcon(markerImage_post_highlight);
 		});
@@ -91,6 +92,7 @@ function populate(locations) {
 				marker.setIcon(markerImage_post_highlight);
 			}
 			
+			updateSelected();			
 		});
 		
 		google.maps.event.addListener(marker, 'dblclick', function() {
@@ -100,6 +102,7 @@ function populate(locations) {
 		google.maps.event.addListener(marker, 'mouseout', function() {
 			$.each(location, function(j, event){
 				$("#" + posts[event].id).removeClass('highlight');
+				$('#postid-' + event).removeClass('highlight');
 			});
 			if (!marker.select) {
 				marker.setIcon(markerImage_post);
@@ -120,6 +123,7 @@ function populate(locations) {
 				function () {
 					marker.setIcon(markerImage_post_highlight);
 					$(this).addClass('highlight');
+					$('#postid-' + event).addClass('highlight');
 				},
 				function () {
 					// don't reset the icon unless we're allowed to
@@ -127,6 +131,7 @@ function populate(locations) {
 						marker.setIcon(markerImage_post);
 					}
 					$(this).removeClass('highlight');
+					$('#postid-' + event).removeClass('highlight');
 				}
 			);
 			
@@ -202,6 +207,8 @@ function populate(locations) {
 						}
 					}
 					
+					updateSelected();
+					
 					/* Note that we can't return false, we need the click to propogate to other events
 					 * for this date */
 				}
@@ -213,6 +220,20 @@ function populate(locations) {
 	if (bounds.isEmpty() || bounds.toSpan().lat() < 0.02 || bounds.toSpan().lng() < 0.02) {
 		map.setCenter(bounds.getCenter());
 		map.setZoom(14);
+	}
+}
+
+function updateSelected() {
+	
+	
+	if (selected.length <= 0) {
+		$('li.post').show();
+	} else {
+		$('li.post').hide();
+		
+		$.each(selected, function(i, s) {
+			$('#postid-' + s).show();
+		});
 	}
 }
 

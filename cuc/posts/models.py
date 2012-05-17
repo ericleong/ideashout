@@ -1,7 +1,9 @@
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import post_save
 from django.template.defaultfilters import slugify
+from django.utils.timezone import now
 
 # Create your models here.
 
@@ -31,6 +33,13 @@ class Post(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title)[:50]
         super(Post, self).save(*args, **kwargs)
+        
+    def clean(self):
+        if self.start_time:
+            if self.start_time < now():
+                raise ValidationError('The event must occur in the future!')
+            if self.end_time and self.end_time < self.start_time:
+                raise ValidationError('The end time must be after the start time!')
 
 class Location(models.Model):
     name = models.CharField(max_length=100)

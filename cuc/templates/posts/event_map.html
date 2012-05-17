@@ -51,4 +51,14 @@ var locations = [
 	</div>
 </div>
 
+<ul class="posts">
+{% for post in posts %}
+{% if user.is_authenticated or not post.private %}
+
+	{% include "posts/event_post.html" %}
+
+{% endif %}
+{% endfor %}
+</ul>
+
 {% endblock %}

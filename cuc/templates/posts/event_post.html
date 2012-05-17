@@ -1,6 +1,6 @@
 {% load humanize %}
 
-<li class="post">
+<li class="post" id="postid-{{ post.id }}">
 	<div class="post-title">
 		<a href="{% if post.link %}{{ post.link }}{% else %}{{ post.get_absolute_url }}{% endif %}">{{ post.title }}</a>
 	</div>
@@ -13,7 +13,7 @@
 	<div class="post-info">
 		{% if post.location %}
 		<div class="post-location">
-			<a href="http://maps.google.com/maps?q={{ post.location.address|urlencode }}">
+			<a href="{{ post.location.get_absolute_url }}">
 				<div class="post-location-name">{{ post.location.name|escapejs }}
 				{% if post.location.room %}<span class="post-location-room">({{ post.location.room|escapejs }})</span>{% endif %}
 				</div>

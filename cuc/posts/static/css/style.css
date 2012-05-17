@@ -493,6 +493,10 @@ input[type=submit]:hover {
 	color: white;
 }
 
+.post.highlight {
+	background-color: rgba(255, 66, 106, .25);
+}
+
 /* map */
 #event-map {
 	width: 50%;
