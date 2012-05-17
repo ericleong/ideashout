@@ -130,28 +130,28 @@ function populate(locations) {
 				}
 			);
 			
+			function isDeselectable(s) {
+				/*
+				 * This function tells us whether or not any of the currently selected dates
+				 * corresponds to the date the user just clicked on.
+				 * The user obviously didn't deselect if they clicked on a date that only has
+				 * different events.
+				 */
+				var deselect = false;
+				
+				$.each(s, function(k, e){
+					if (e == event) {
+						deselect = true;
+					}
+				});
+				
+				return deselect;
+			}
+			
 			// Click: this is complicated
 			$("#" + posts[event].id).click(				
-				function () {
+				function () {		
 					
-					function isDeselectable(selected) {
-						/**
-						 * This function tells us whether or not any of the currently selected dates
-						 * corresponds to the date the user just clicked on.
-						 * The user obviously didn't deselect if they clicked on a date that only has
-						 * different events.
-						 */
-						var deselect = false;
-						
-						$.each(selected, function(j, e){
-							if (e == event) {
-								deselect = true;
-							}
-						});
-						
-						return deselect;
-					}
-
 					if (isDeselectable(selected)) { // deselect
 						/* If the user did deselect, do the usual.
 						 * Remember that every event for this date will be deselected since
@@ -164,14 +164,12 @@ function populate(locations) {
 						selected.splice(selected.indexOf(event), 1);
 						
 					} else { // select
-						/*
-						 * The user has selected us!
-						 */
+						
 						// create a separate list to mark down the previous selection
-						var remove_selected = selected.slice(0);
+						var remove_selected = [];
 						
 						// deselect previous selection
-						$.each(selected, function(j, e){
+						$.each(selected, function(k, e){
 							// If a previously selected element doesn't have the date of the 
 							// currently selected element, remove it (no longer selected)
 							if (posts[e].id != posts[event].id) {
@@ -184,11 +182,13 @@ function populate(locations) {
 						});
 						
 						// Remove the events marked for selection
-						$.each(remove_selected, function(j, e) {
-							selected.splice(selected.indexOf(e), 1);
-						});
+						if (remove_selected.length > 0) {
+							for (var k = 0; k < remove_selected.length; k++) {
+								selected.splice(selected.indexOf(remove_selected[k]), 1);
+							}
+						}
 						
-						// Make the current location selected.
+						// Make the current location is selected.
 						// Other events during this date will activate when the click is propogated.
 						marker.setIcon(markerImage_post_highlight);			
 						marker.select = true;
