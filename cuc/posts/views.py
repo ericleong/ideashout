@@ -287,8 +287,8 @@ class EventCreationForm(LinkCreationForm):
         location, created = Location.objects.get_or_create(name=loc_str, #@UnusedVariable
                                                            room=room_str, 
                                                            address=address_str)
-        location.latitude = latitude_str;
-        location.longitude = longitude_str;
+        location.latitude = float(latitude_str);
+        location.longitude = float(longitude_str);
         location.save()
         
         return location

@@ -14,10 +14,10 @@
 		{% if post.location %}
 		<div class="post-location">
 			<a href="{{ post.location.get_absolute_url }}">
-				<div class="post-location-name">{{ post.location.name|escapejs }}
-				{% if post.location.room %}<span class="post-location-room">({{ post.location.room|escapejs }})</span>{% endif %}
+				<div class="post-location-name">{{ post.location.name }}
+				{% if post.location.room %}<span class="post-location-room">({{ post.location.room }})</span>{% endif %}
 				</div>
-				<div class="post-location-address">{{ post.location.address|escapejs }}</div>
+				<div class="post-location-address">{{ post.location.address }}</div>
 			</a> 
 		</div>
 		{% endif %}
