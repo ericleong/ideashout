@@ -51,13 +51,22 @@ class MapView(ListView):
     context_object_name="posts"
     
     def get_queryset(self):
+        if 'year' in self.kwargs and 'month' in self.kwargs:
+            return Post.objects.filter(start_time__isnull=False, start_time__year=self.kwargs['year'], start_time__month=self.kwargs['month']).order_by("start_time")
         return Post.objects.filter(start_time__isnull=False, start_time__month=now().date().month).order_by("start_time")
     
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super(MapView, self).get_context_data(**kwargs)
-        # Add in a QuerySet of all the books
-        context['locations'] = Location.objects.filter(events__start_time__isnull=False, events__start_time__month=now().date().month).distinct()
+        
+        # Add in a QuerySet of all the locations
+        if 'year' in self.kwargs and 'month' in self.kwargs:
+            context['year'] =  int(self.kwargs['year'])
+            context['month'] = int(self.kwargs['month'])
+            context['locations'] = Location.objects.filter(events__start_time__isnull=False, events__start_time__year=self.kwargs['year'], events__start_time__month=self.kwargs['month']).distinct()
+        else:
+            context['locations'] = Location.objects.filter(events__start_time__isnull=False, events__start_time__month=now().date().month).distinct()
+        
         return context
     
 class DayView(DayArchiveView):

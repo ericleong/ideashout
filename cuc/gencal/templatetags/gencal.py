@@ -38,7 +38,8 @@ def gencal(obj_list, year=None, month=None, calendar_class=None):
         month = today.month
     if not calendar_class:
         calendar_class = ListCalendar
-    return ''.join(calendar_class(obj_list).formatmonth(year, month))
+    
+    return ''.join(calendar_class(obj_list, year, month).formatmonth(year, month))
 
 class ListCalendar(HTMLCalendar):
     """
@@ -182,6 +183,7 @@ class ListCalendar(HTMLCalendar):
  
         a('<table border="0" cellpadding="0" cellspacing="0" class="month">')
         a('\n')
+        #TODO: previous + next months
         a(self.formatmonthname(theyear, themonth, withyear=withyear))
         a('\n')
         a(self.formatweekheader())

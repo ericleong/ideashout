@@ -47,7 +47,11 @@ var locations = [
 	<div id="event-map">
 	</div>
 	<div class="event-calendar">
-		{% gencal posts %}
+		{% if year and month %}
+			{% gencal posts year month %}
+		{% else %}
+			{% gencal posts %}
+		{% endif %}
 	</div>
 </div>
 
