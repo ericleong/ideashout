@@ -220,11 +220,12 @@ function populate(locations) {
 	if (bounds.isEmpty() || bounds.toSpan().lat() < 0.02 || bounds.toSpan().lng() < 0.02) {
 		map.setCenter(bounds.getCenter());
 		map.setZoom(14);
+	} else {
+		map.fitBounds(bounds);
 	}
 }
 
 function updateSelected() {
-	
 	
 	if (selected.length <= 0) {
 		$('li.post').show();
