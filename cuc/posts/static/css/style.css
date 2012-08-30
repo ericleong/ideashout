@@ -460,6 +460,16 @@ input[type=submit]:hover {
     width: 100%;
 }
 
+.event-calendar .prev-month {
+	margin-left: 24px;
+	float: left;
+}
+
+.event-calendar .next-month {
+	margin-right: 24px;
+	float: right;
+}
+
 .event-calendar th, .event-calendar td {
     width: 72px;
 }

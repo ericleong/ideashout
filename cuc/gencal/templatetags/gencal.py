@@ -5,6 +5,7 @@ from django.utils.datastructures import SortedDict
 from posts.models import Post
 import datetime
 import django.utils.timezone
+import calendar
 
 register = template.Library()
 
@@ -163,6 +164,38 @@ class ListCalendar(HTMLCalendar):
         :rtype: tuple(datetime, int)
         """
         return [[(dt, dt.weekday()) for dt in week] for week in self.monthdatescalendar(year, month)]
+    
+    def formatmonthname(self, theyear, themonth, withyear=True):
+        """
+        Return a formatted month name with previous and next months.
+        """
+        
+        # prev month
+        prev_month_month = themonth - 1
+        if prev_month_month == 0:
+            prev_month_month = 12
+            prev_month_year = theyear - 1
+        else:
+            prev_month_year = theyear
+        prev_mon = '<a class="prev-month" href="/events/map/' + str(prev_month_year) + '/' + str(prev_month_month) + '">&lt</a>'
+            
+        # next month
+        next_month_month = themonth + 1
+        if next_month_month == 13:
+            next_month_month = 1
+            next_month_year = theyear + 1
+        else:
+            next_month_year = theyear
+        next_mon = '<a class="next-month" href="/events/map/' + str(next_month_year) + '/' + str(next_month_month) + '">&gt</a>'
+        
+        if withyear:
+            s = '%s %s' % (calendar.month_name[themonth], theyear)
+        else:
+            s = '%s' % calendar.month_name[themonth]
+        
+        s = '%s%s%s' % (prev_mon, s, next_mon)
+        
+        return '<tr><th colspan="7" class="month">%s</th></tr>' % s
 
     def formatmonth(self, theyear, themonth, withyear=True):
         """
@@ -183,7 +216,6 @@ class ListCalendar(HTMLCalendar):
  
         a('<table border="0" cellpadding="0" cellspacing="0" class="month">')
         a('\n')
-        #TODO: previous + next months
         a(self.formatmonthname(theyear, themonth, withyear=withyear))
         a('\n')
         a(self.formatweekheader())

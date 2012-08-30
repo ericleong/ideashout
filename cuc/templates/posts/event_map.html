@@ -44,8 +44,10 @@ var locations = [
 	<h1>Event Map</h1>
 </div>
 <div class="twocol">
+	{% if locations %}
 	<div id="event-map">
 	</div>
+	{% endif %}
 	<div class="event-calendar">
 		{% if year and month %}
 			{% gencal posts year month %}
