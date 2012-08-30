@@ -15,7 +15,6 @@
 	<span><a class="stationary" href="{% url events %}">Events</a></span>
 </div>
 
-{% spaceless %}
 {% for post in posts %}
 
 {% if user.is_authenticated or not post.private %}
@@ -34,6 +33,5 @@
 {% endif %}
 
 {% endfor %}
-{% endspaceless %}
 
 {% endblock %}
