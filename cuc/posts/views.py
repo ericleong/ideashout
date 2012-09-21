@@ -28,6 +28,15 @@ class TagView(ListView):
     
     def get_queryset(self):
         return Post.objects.order_by("-created").filter(tags__name=self.kwargs['tag'])
+    
+class TagEventView(ListView):
+    # TODO: a slightly different page with the tag name?
+    model=Post
+    context_object_name="posts"
+    template_name ="posts/event_list.html"
+    
+    def get_queryset(self):
+        return Post.objects.filter(tags__name=self.kwargs['tag'], start_time__isnull=False, start_time__gte=now()).order_by("start_time")
 
 class LocationView(ListView):
     model=Post

@@ -8,7 +8,8 @@ from django.views.generic.list import ListView
 from posts.models import Post
 from posts.views import latestPostsFeed, PostView, generate_calendar, UserView, \
     CreateLinkView, CreateEventView, TagView, SignupForm, EditUserView, \
-    CreateIdeaView, MonthView, DayView, YearView, MapView, LocationView
+    CreateIdeaView, MonthView, DayView, YearView, MapView, LocationView, \
+    TagEventView
 import django.contrib.auth.views
 import settings
 
@@ -49,6 +50,7 @@ urlpatterns = patterns('',
     
     # Tags
     url(r'^tag/(?P<tag>.+)/$', TagView.as_view(model=Post, context_object_name="posts",), name="tag"),
+    url(r'^tag/(?P<tag>.+)/events$', TagEventView.as_view(model=Post, context_object_name="posts"), name="tag-events"),
     
     # Locations
     url(r'^location/(?P<slug>.+)/$', LocationView.as_view(), name="location"),
