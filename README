@@ -1,0 +1,32 @@
+IdeaShout is a social aggregator for events and ideas, exploring the connection between space and time.
+
+Pitch
+-----
+> IdeaShout is a social network for clubs focused on fostering communication
+> and interaction within the club and with the local community. It helps
+> brainstorm ideas through the active sharing of online and offline content,
+> which is coupled with commentary by fellow club members. The site is split
+> into events, links, and ideas, and members can post in all three sections.
+> Events include job fairs, hackathons, and seminars, while links are for
+> tutorials and articles found online. Ideas new and old can be posted for
+> members to see and critique, allowing great ideas to shine despite the low
+> entry barrier. A news feed merges all the content into one simple stream,
+> providing members with a simple way to keep tabs on the community. It's
+> food for thought for hungry minds.
+
+Visit http://ideashout.com to see it in action.
+
+Acknowledgements
+----------------
+IdeaShout is built with Python and Django along with these python packages
+
+* iCalendar (http://icalendar.readthedocs.org/en/latest/)
+* django-gencal (http://code.justinlilly.com/django-gencal/) 
+
+Deployment
+----------
+Navigate to the ```cuc``` directory in a terminal and run
+
+	python manage.py runserver
+
+and navigate to ```localhost:8000``` in your favorite browser.
